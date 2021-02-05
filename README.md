@@ -1,24 +1,7 @@
-# README
+# LEAD SCRAPER
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Goals
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- To import leads from a CSV file to a database
+- To turn companies into leads and mark said companies as scraped
+- To push scrape results into Airtable
