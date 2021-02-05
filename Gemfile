@@ -3,6 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.2'
 
+gem 'administrate'
 gem 'rails', '~> 6.1.1'
 gem 'jsonb_accessor', '~> 1.0.0'
 gem 'pg', '>= 0.18', '< 2.0'
@@ -24,6 +25,7 @@ group :development do
   gem 'rack-mini-profiler', '~> 2.0'
   gem 'listen', '~> 3.3'
   gem 'spring'
+  gem 'awesome_print'
 end
 
 group :test do
