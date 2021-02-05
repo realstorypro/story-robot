@@ -4,5 +4,5 @@ employees: 1 - 50
 revenue: 1m - 50m
 status: active
 ipo: private
-website tech: wordpress
-company tech: salesforce marketing cloud
+website_tech: wordpress
+company_tech: salesforce marketing cloud

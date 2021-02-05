@@ -5,9 +5,14 @@ class Company < ApplicationRecord
                   slug: :string,
                   url: :string,
                   keyword: :string,
+                  headquarters: :string,
                   employees: :string,
                   revenue: :string,
+                  status: :string,
                   ipo: :string,
                   website_tech: :string,
                   company_tech: :string
+
+  # we don't want to have duplicate names
+  validates_uniqueness_of :name
 end

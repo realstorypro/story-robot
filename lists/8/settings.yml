@@ -4,5 +4,5 @@ employees: 11 - 500
 revenue: 1m - 50m
 status: active
 ipo: private
-website tech: wordpress
-company tech: pipedrive
+website_tech: wordpress
+company_tech: pipedrive
