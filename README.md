@@ -1,4 +1,4 @@
-# LEAD SCRAPER
+# Company Scraper
 
 ## Goals
 
