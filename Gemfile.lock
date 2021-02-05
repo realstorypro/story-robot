@@ -75,6 +75,7 @@ GEM
       selectize-rails (~> 0.6)
     autoprefixer-rails (10.1.0.0)
       execjs
+    awesome_print (1.8.0)
     bindex (0.8.1)
     bootsnap (1.7.1)
       msgpack (~> 1.0)
@@ -242,6 +243,7 @@ PLATFORMS
 
 DEPENDENCIES
   administrate
+  awesome_print
   bootsnap (>= 1.4.4)
   byebug
   capybara (>= 3.26)
