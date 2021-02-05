@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 2021_02_05_222437) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "found"
-    t.boolean "errors"
+    t.boolean "error"
   end
 
 end

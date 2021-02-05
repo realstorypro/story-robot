@@ -16,7 +16,7 @@ namespace :scraper do
 
 
     def load_page(page)
-      puts 'the page is being loaded'
+      puts "loading #{page}"
     end
 
     def format_name(name)
@@ -26,6 +26,8 @@ namespace :scraper do
     @companies.each do |company|
       formatted_name = format_name(company.name)
       puts formatted_name
+
+      load_page("/organization/#{formatted_name}")
     end
 
     #driver = Selenium::WebDriver::Driver.for :chrome
