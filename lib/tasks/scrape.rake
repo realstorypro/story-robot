@@ -15,7 +15,7 @@ namespace :scraper do
     # initial variables
     BASE_URL = 'https://www.crunchbase.com'
 
-    @companies = Company.where(found: false)
+    @companies = Company.where(found: false, error: false)
 
     def load_page(route)
       url = "#{BASE_URL}#{route}"
@@ -52,10 +52,22 @@ namespace :scraper do
     @companies.each do |company|
       formatted_name = format_name(company.name)
       load_page("/organization/#{formatted_name}")
+
+      # lets wait 5 seconds to ensure the page loads
+      sleep(5)
+
+      begin
+        profile_name = @driver.find_element(:css, '.profile-name')
+      rescue Selenium::WebDriver::Error::NoSuchElementError
+        puts 'profile  not found'
+        company.error = true
+        company.save
+        next
+      end
+
+
     end
 
 
-    # driver.navigate.to 'https://www.google.com'
-    # sleep(250)
   end
 end
