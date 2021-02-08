@@ -62,6 +62,8 @@ namespace :upload do
 
       contact.uploaded = true
       contact.save
+
+      sleep(30)
     end
   end
 end
