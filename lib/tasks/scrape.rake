@@ -127,7 +127,7 @@ namespace :scraper do
       puts "finished scraping #{formatted_name}"
 
       # lets pause for a little bit to prevent automation detection
-      sleep(rand(3..10))
+      sleep(rand(15..30))
 
     end
 
