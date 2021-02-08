@@ -39,4 +39,6 @@
 yarn-debug.log*
 .yarn-integrity
 
+# User ignore files
+.env
 .idea/*

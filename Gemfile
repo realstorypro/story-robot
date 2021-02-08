@@ -21,6 +21,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'selenium-webdriver'
   gem 'webdrivers'
+  gem 'dotenv-rails'
 end
 
 group :development do
