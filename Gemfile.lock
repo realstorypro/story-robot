@@ -73,6 +73,8 @@ GEM
       momentjs-rails (~> 2.8)
       sassc-rails (~> 2.1)
       selectize-rails (~> 0.6)
+    airtable (0.0.9)
+      httparty
     autoprefixer-rails (10.2.4.0)
       execjs
     awesome_print (1.8.0)
@@ -94,6 +96,10 @@ GEM
     crass (1.0.6)
     datetime_picker_rails (0.0.7)
       momentjs-rails (>= 2.8.1)
+    dotenv (2.7.6)
+    dotenv-rails (2.7.6)
+      dotenv (= 2.7.6)
+      railties (>= 3.2)
     erubi (1.10.0)
     execjs (2.7.0)
     ffi (1.14.2)
@@ -252,10 +258,12 @@ PLATFORMS
 
 DEPENDENCIES
   administrate
+  airtable
   awesome_print
   bootsnap (>= 1.4.4)
   byebug
   capybara (>= 3.26)
+  dotenv-rails
   httparty
   jbuilder (~> 2.7)
   jsonb_accessor (~> 1.0.0)
