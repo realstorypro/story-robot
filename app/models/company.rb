@@ -4,6 +4,7 @@ class Company < ApplicationRecord
   jsonb_accessor  :fields,
                   slug: :string,
                   url: :string,
+                  location: :string,
                   keyword: :string,
                   headquarters: :string,
                   employees: :string,

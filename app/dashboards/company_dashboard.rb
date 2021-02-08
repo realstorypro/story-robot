@@ -8,11 +8,14 @@ class CompanyDashboard < Administrate::BaseDashboard
   # which determines how the attribute is displayed
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
+    contacts: Field::HasMany,
     id: Field::Number,
     name: Field::String,
     fields: Field::String.with_options(searchable: false),
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
+    found: Field::Boolean,
+    error: Field::Boolean,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -21,28 +24,34 @@ class CompanyDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
+  contacts
   id
   name
   fields
-  created_at
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
+  contacts
   id
   name
   fields
   created_at
   updated_at
+  found
+  error
   ].freeze
 
   # FORM_ATTRIBUTES
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = %i[
+  contacts
   name
   fields
+  found
+  error
   ].freeze
 
   # COLLECTION_FILTERS
