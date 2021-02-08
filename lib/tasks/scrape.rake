@@ -7,7 +7,7 @@ namespace :scraper do
   desc 'begin the scrape process'
   task :scrape, [:number] => :environment do |_t, _args|
     # notifications
-    WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+    WEBHOOK_URL = ENV['SLACK_URL']
 
     # initialize selenium driver
     @driver = Selenium::WebDriver::Driver.for :chrome

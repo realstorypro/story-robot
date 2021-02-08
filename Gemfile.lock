@@ -73,6 +73,8 @@ GEM
       momentjs-rails (~> 2.8)
       sassc-rails (~> 2.1)
       selectize-rails (~> 0.6)
+    airtable (0.0.9)
+      httparty
     autoprefixer-rails (10.2.4.0)
       execjs
     awesome_print (1.8.0)
@@ -256,6 +258,7 @@ PLATFORMS
 
 DEPENDENCIES
   administrate
+  airtable
   awesome_print
   bootsnap (>= 1.4.4)
   byebug
