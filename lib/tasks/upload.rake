@@ -63,7 +63,7 @@ namespace :upload do
       contact.uploaded = true
       contact.save
 
-      sleep(30)
+      sleep(15)
     end
   end
 end
