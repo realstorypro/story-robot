@@ -11,16 +11,18 @@ namespace :export do
     export_folder = "#{Dir.pwd}#{list_loc}/"
 
     timestamp = Time.now.to_i
-    attribues = %w[name url]
-    headers = ["name", "url"]
+    attributes = %w[name domain_with_www]
+    headers = ["name", "domain"]
 
     companies = Company.where(exported: false).limit(args[:number])
 
     CSV.open("#{export_folder}/#{timestamp}-#{args[:number]}.csv", 'w') do |csv|
       csv << headers
-      companies.each do |company|
-
+      companies.each do |record|
+        csv << attributes.map { |attr| record.send(attr) }
+        record.update(exported: true)
       end
     end
+
   end
 end

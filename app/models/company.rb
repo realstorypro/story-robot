@@ -17,4 +17,8 @@ class Company < ApplicationRecord
   # we don't want to have duplicate names
   validates_uniqueness_of :name
   has_many :contacts
+
+  def domain_with_www
+    "www.#{self.url}"
+  end
 end
