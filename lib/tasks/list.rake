@@ -23,12 +23,24 @@ namespace :list do
     headquarters = prompt.ask 'Where are the headquarters?', default: 'United States', convert: :string
     employees = prompt.select 'How many employees', %w[1-10 11-50 51-100 101-250 251-500 501-1000 1001-5000 5001-10000 10001-10001+]
     revenue = prompt.select 'What is the revenue', %w[0-1m 1m-10m 10m-50m 50m-100m 100m-500m 500m-1b 1b-10b 10b-10b+]
-    status = prompt.select 'What is the revenue', %w[Active Closed]
+    status = prompt.select 'What is the company status', %w[Active Closed]
     ipo = prompt.select 'IPO Status', %w[Public Private Delisted]
     website_tech = prompt.ask 'Website tech?'
     company_tech = prompt.ask 'Company tech?'
 
+    settings = {
+      keyword: keyword,
+      headquarters: headquarters,
+      employees: employees,
+      revenue: revenue,
+      status: status,
+      ipo: ipo,
+      website_tech: website_tech,
+      company_tech: company_tech
+    }
 
+    Dir.mkdir "#{list_folder}#{list_number}"
+    File.open("#{list_folder}#{list_number}/settings.yml", "w") { |file| file.write(settings.to_yaml) }
 
     def get_clipboard
       Clipboard.paste.encode('UTF-8')
