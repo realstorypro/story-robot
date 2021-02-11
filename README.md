@@ -1,4 +1,4 @@
-# Company Scraper
+# Crunchbase Scraper
 
 ## Goals
 
