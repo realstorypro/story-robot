@@ -19,6 +19,8 @@ class Company < ApplicationRecord
   has_many :contacts
 
   def domain_with_www
-    "www.#{self.url}"
+    return "www.#{self.url}" unless self.url.blank?
+
+    ''
   end
 end
