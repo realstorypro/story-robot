@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 2021_02_11_014255) do
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "found"
     t.boolean "error"
-    t.boolean "exported"
+    t.boolean "exported", default: false
   end
 
   create_table "contacts", force: :cascade do |t|
