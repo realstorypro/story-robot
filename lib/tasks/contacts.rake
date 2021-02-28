@@ -47,17 +47,51 @@ namespace :contacts do
     contacts = Contact.where(enriched: true, invalid_email: false, uploaded: false, email: nil).limit(args[:number])
 
     contacts.each do |contact|
-      first_name = contact.first_name.downcase.capitalize
-      last_name = contact.last_name.downcase.capitalize
-      domain = contact.company.url
+      begin
+        first_name = I18n.transliterate(contact.first_name.downcase.capitalize)
+        last_name = I18n.transliterate(contact.last_name.downcase.capitalize)
+        domain = contact.company.url
+      rescue
+        contact.update(invalid_email: true)
+        next
+      end
 
       email_finder_resp =
         HTTParty.get "https://api.hunter.io/v2/email-finder?domain=#{domain}&first_name=#{first_name}&last_name=#{last_name}&api_key=#{ENV['HUNTER_API_KEY']}"
 
       # skip to the next contact if we can't find an email
-      if email_finder_resp.parsed_response['data']['verification']['status'].nil?
-        contact.update(invalid_email: true)
-        next
+      begin
+        if email_finder_resp.parsed_response['data']['verification']['status'].nil?
+          contact.update(invalid_email: true)
+          next
+        end
+      rescue
+
+        case email_finder_resp.parsed_response['errors'][0]['details']
+        when 'Last name cannot only be made up of single letters'
+          contact.update(invalid_email: true)
+          next
+        when 'This domain name cannot receive emails.'
+          contact.update(invalid_email: true)
+          next
+        when 'The provided domain is not a valid domain name'
+          contact.update(invalid_email: true)
+          next
+        when 'Last name has wrong format'
+          contact.update(invalid_email: true)
+          next
+        when 'First name cannot only be made up of single letters'
+          contact.update(invalid_email: true)
+          next
+        when "The person behind this email address has asked us directly or indirectly to stop the processing of this email. Therefore, you shouldn't process this email yourself in any way."
+          contact.update(invalid_email: true)
+          next
+        when "You are missing one of the following parameters: company, domain"
+          contact.update(invalid_email: true)
+          next
+        end
+
+        byebug
       end
 
       contact.update(email: email_finder_resp.parsed_response['data']['email'])
