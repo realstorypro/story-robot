@@ -15,7 +15,6 @@ namespace :contacts do
     puts "Enriching #{contacts.count}..."
 
     contacts.each do |contact|
-
       # skip enrichment, but set enriched to yes and set no address field to true
       if contact.company.location.nil?
         puts "no address for #{contact.company.name}"
@@ -37,7 +36,6 @@ namespace :contacts do
 
       contact.update(timezone: timezone_resp['timeZoneId'], enriched: true)
     end
-
   end
 
   desc 'finding and verifying emails for scraped contacts'
@@ -51,7 +49,7 @@ namespace :contacts do
         first_name = I18n.transliterate(contact.first_name.downcase.capitalize)
         last_name = I18n.transliterate(contact.last_name.downcase.capitalize)
         domain = contact.company.url
-      rescue
+      rescue StandardError
         contact.update(invalid_email: true)
         next
       end
@@ -65,8 +63,7 @@ namespace :contacts do
           contact.update(invalid_email: true)
           next
         end
-      rescue
-
+      rescue StandardError
         case email_finder_resp.parsed_response['errors'][0]['details']
         when 'Last name cannot only be made up of single letters'
           contact.update(invalid_email: true)
@@ -86,7 +83,7 @@ namespace :contacts do
         when "The person behind this email address has asked us directly or indirectly to stop the processing of this email. Therefore, you shouldn't process this email yourself in any way."
           contact.update(invalid_email: true)
           next
-        when "You are missing one of the following parameters: company, domain"
+        when 'You are missing one of the following parameters: company, domain'
           contact.update(invalid_email: true)
           next
         end
@@ -107,9 +104,54 @@ namespace :contacts do
 
       msg_slack "Found email for #{first_name} #{last_name}"
     end
-
   end
 
+  desc 'uploading contacts to customer.io'
+  task :upload, [:number] => :environment do |_t, args|
+    msg_slack("Uploading #{args[:number]} contacts to customer.io")
+
+    $customerio = Customerio::Client.new(ENV['CUSTOMER_IO_SITE_ID'], ENV['CUSTOMER_IO_KEY'])
+
+    contacts =  Contact.where(uploaded: false, invalid_email: false).where.not(email: nil).limit(args[:number])
+
+    contacts.each do |contact|
+      company_tech = if contact.company.company_tech.nil?
+                       ''
+                     else
+                       contact.company.company_tech
+                     end
+
+      website_tech = if contact.company.website_tech.nil?
+                       ''
+                     else
+                       contact.company.website_tech
+                     end
+
+      $customerio.identify(
+        id: contact.email,
+        email: contact.email,
+        created_at: contact.created_at.to_i,
+        last_name: contact.last_name,
+        first_name: contact.first_name,
+        title: contact.title,
+        company: contact.company.name,
+        url: contact.company.url,
+        headquarters: contact.company.headquarters.titleize,
+        employees: contact.company.employees,
+        ipo: contact.company.ipo,
+        company_tech: company_tech,
+        website_tech: website_tech,
+        revenue: contact.company.revenue,
+        keyword: contact.company.keyword,
+        location: contact.company.location,
+        timezone: contact.timezone,
+        source: 'rails'
+      )
+
+      $customerio.track(contact.email, 'begin nurture')
+      contact.update(uploaded: true)
+    end
+  end
 
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
