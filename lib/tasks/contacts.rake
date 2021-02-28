@@ -15,7 +15,7 @@ namespace :contacts do
     puts "Enriching #{contacts.count}..."
 
     contacts.each do |contact|
-      company_location = contact.company.location
+      company_location = I18n.transliterate(contact.company.location)
       puts company_location
 
       geocoding_resp =
