@@ -7,6 +7,7 @@ ruby '2.7.2'
 
 gem 'administrate'
 gem 'airtable'
+gem 'customerio'
 gem 'httparty'
 gem 'jbuilder', '~> 2.7'
 gem 'jsonb_accessor', '~> 1.0.0'
