@@ -4,11 +4,11 @@ require 'selenium-webdriver'
 require 'httparty'
 
 namespace :contacts do
+  # notification url
+  WEBHOOK_URL = ENV['SLACK_URL']
+
   desc 'enrich the scraped contacts'
   task :enrich, [:number] => :environment do |_t, args|
-    # notifications
-    WEBHOOK_URL = ENV['SLACK_URL']
-
     msg_slack("Enriching #{args[:number]} contacts")
 
     contacts = Contact.where(enriched: false, invalid_email: false, uploaded: false).limit(args[:number])
@@ -37,6 +37,12 @@ namespace :contacts do
     end
 
   end
+
+  desc 'finding and verifying emails for scraped contacts'
+  task :find_email, [:number] => :environment do |_t, args|
+    msg_slack("Finding emails for #{args[:number]} contacts")
+  end
+
 
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
