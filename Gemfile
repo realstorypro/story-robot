@@ -1,26 +1,27 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.7.2'
 
 gem 'administrate'
-gem 'rails', '~> 6.1.1'
+gem 'airtable'
+gem 'httparty'
+gem 'jbuilder', '~> 2.7'
 gem 'jsonb_accessor', '~> 1.0.0'
 gem 'pg', '>= 0.18', '< 2.0'
 gem 'puma', '~> 5.0'
+gem 'rails', '~> 6.1.1'
 gem 'sass-rails', '>= 6'
-gem 'webpacker', '~> 5.0'
+gem 'tty-prompt'
 gem 'turbolinks', '~> 5'
-gem 'jbuilder', '~> 2.7'
-gem 'httparty'
-gem "tty-prompt"
-gem 'airtable'
-
+gem 'webpacker', '~> 5.0'
 
 gem 'bootsnap', '>= 1.4.4', require: false
 
 group :development, :test do
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'clipboard'
   gem 'dotenv-rails'
   gem 'selenium-webdriver'
@@ -28,11 +29,11 @@ group :development, :test do
 end
 
 group :development do
-  gem 'web-console', '>= 4.1.0'
-  gem 'rack-mini-profiler', '~> 2.0'
-  gem 'listen', '~> 3.3'
-  gem 'spring'
   gem 'awesome_print'
+  gem 'listen', '~> 3.3'
+  gem 'rack-mini-profiler', '~> 2.0'
+  gem 'spring'
+  gem 'web-console', '>= 4.1.0'
 end
 
 group :test do

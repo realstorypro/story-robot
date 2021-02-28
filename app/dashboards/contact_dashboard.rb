@@ -15,6 +15,10 @@ class ContactDashboard < Administrate::BaseDashboard
     fields: Field::String.with_options(searchable: false),
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
+    uploaded: Field::Boolean,
+    enriched: Field::Boolean,
+    invalid_email: Field::Boolean,
+    email: Field::String,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -23,32 +27,40 @@ class ContactDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
-  company
-  id
-  first_name
-  last_name
+    company
+    id
+    first_name
+    last_name
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
-  company
-  id
-  first_name
-  last_name
-  fields
-  created_at
-  updated_at
+    company
+    id
+    first_name
+    last_name
+    fields
+    created_at
+    updated_at
+    uploaded
+    enriched
+    invalid_email
+    email
   ].freeze
 
   # FORM_ATTRIBUTES
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = %i[
-  company
-  first_name
-  last_name
-  fields
+    company
+    first_name
+    last_name
+    fields
+    uploaded
+    enriched
+    invalid_email
+    email
   ].freeze
 
   # COLLECTION_FILTERS
