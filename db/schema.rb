@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_28_153300) do
+ActiveRecord::Schema.define(version: 2021_02_28_165806) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 2021_02_28_153300) do
     t.boolean "uploaded", default: false
     t.boolean "enriched", default: false
     t.boolean "invalid_email", default: false
+    t.string "email"
     t.index ["company_id"], name: "index_contacts_on_company_id"
   end
 
