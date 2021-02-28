@@ -15,6 +15,14 @@ namespace :contacts do
     puts "Enriching #{contacts.count}..."
 
     contacts.each do |contact|
+
+      # skip enrichment, but set enriched to yes and set no address field to true
+      if contact.company.location.nil?
+        puts "no address for #{contact.company.name}"
+        contact.update(no_address: true, enriched: true)
+        next
+      end
+
       company_location = I18n.transliterate(contact.company.location)
       puts company_location
 
@@ -22,16 +30,12 @@ namespace :contacts do
         HTTParty.get("https://maps.googleapis.com/maps/api/geocode/json?key=#{ENV['GOOGLE_MAPS_KEY']}&censor=false&address=#{company_location}")
 
       coordinates = geocoding_resp['results'][0]['geometry']['location']
-      contact.lat = coordinates['lat']
-      contact.lng = coordinates['lng']
+      contact.update(lat: coordinates['lat'], lng: coordinates['lng'])
 
       timezone_resp =
         HTTParty.get("https://maps.googleapis.com/maps/api/timezone/json?key=#{ENV['GOOGLE_MAPS_KEY']}&censor=false&timestamp=1331161200&location=#{contact.lat},#{contact.lng}")
 
-      contact.timezone = timezone_resp['timeZoneId']
-      contact.enriched = true
-
-      contact.save
+      contact.update(timezone: timezone_resp['timeZoneId'], enriched: true)
     end
 
   end
