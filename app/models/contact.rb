@@ -4,7 +4,7 @@ class Contact < ApplicationRecord
                   title: :string,
                   email: :string,
                   lat: :string,
-                  lang: :string,
+                  lng: :string,
                   timezone: :string
 
 end
