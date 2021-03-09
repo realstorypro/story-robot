@@ -18,6 +18,9 @@ namespace :import do
     CSV.foreach("#{import_folder}/list_of_company_names_raw.csv") do |row|
       # no double entries
       next if Company.where(name: row[0]).count.positive?
+
+      # minimum 2 letters
+      next if row[0].length < 2
       
       Company.create(
         name: row[0],
