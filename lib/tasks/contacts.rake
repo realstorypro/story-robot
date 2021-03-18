@@ -64,6 +64,9 @@ namespace :contacts do
           next
         end
       rescue StandardError
+        # if for some reason we get nothing just skip.
+        next if email_finder_resp.nil?
+
         case email_finder_resp.parsed_response['errors'][0]['details']
         when 'Last name cannot only be made up of single letters'
           contact.update(invalid_email: true)
@@ -87,8 +90,6 @@ namespace :contacts do
           contact.update(invalid_email: true)
           next
         end
-
-        byebug
       end
 
       contact.update(email: email_finder_resp.parsed_response['data']['email'])
