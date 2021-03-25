@@ -97,9 +97,15 @@ namespace :contacts do
       email_verifier_resp =
         HTTParty.get "https://api.hunter.io/v2/email-verifier?email=#{contact.email}&api_key=#{ENV['HUNTER_API_KEY']}"
 
-      # skip to the next contact if the email is not valid
-      if email_verifier_resp.parsed_response['data']['score'] < 80
-        contact.update(invalid_email: true)
+      begin
+        # skip to the next contact if the email is not valid
+        if email_verifier_resp.parsed_response['data']['score'] < 80
+          contact.update(invalid_email: true)
+          next
+        end
+      rescue StandardError
+        # skip if for some reason we are getting an error
+        puts 'error w/ response'
         next
       end
 
