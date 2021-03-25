@@ -15,6 +15,9 @@ namespace :contacts do
     puts "Enriching #{contacts.count}..."
 
     contacts.each do |contact|
+      # skip contacts without company
+      next if contact.company.nil?
+
       # skip enrichment, but set enriched to yes and set no address field to true
       if contact.company.location.nil?
         puts "no address for #{contact.company.name}"
