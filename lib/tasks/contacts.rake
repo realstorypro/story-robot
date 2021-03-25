@@ -15,6 +15,9 @@ namespace :contacts do
     puts "Enriching #{contacts.count}..."
 
     contacts.each do |contact|
+      # skip contacts without company
+      next if contact.company.nil?
+
       # skip enrichment, but set enriched to yes and set no address field to true
       if contact.company.location.nil?
         puts "no address for #{contact.company.name}"
@@ -64,6 +67,9 @@ namespace :contacts do
           next
         end
       rescue StandardError
+        # if for some reason we get nothing just skip.
+        next if email_finder_resp.nil?
+
         case email_finder_resp.parsed_response['errors'][0]['details']
         when 'Last name cannot only be made up of single letters'
           contact.update(invalid_email: true)
@@ -87,8 +93,6 @@ namespace :contacts do
           contact.update(invalid_email: true)
           next
         end
-
-        byebug
       end
 
       contact.update(email: email_finder_resp.parsed_response['data']['email'])
@@ -96,9 +100,15 @@ namespace :contacts do
       email_verifier_resp =
         HTTParty.get "https://api.hunter.io/v2/email-verifier?email=#{contact.email}&api_key=#{ENV['HUNTER_API_KEY']}"
 
-      # skip to the next contact if the email is not valid
-      if email_verifier_resp.parsed_response['data']['score'] < 80
-        contact.update(invalid_email: true)
+      begin
+        # skip to the next contact if the email is not valid
+        if email_verifier_resp.parsed_response['data']['score'] < 80
+          contact.update(invalid_email: true)
+          next
+        end
+      rescue StandardError
+        # skip if for some reason we are getting an error
+        puts 'error w/ response'
         next
       end
 

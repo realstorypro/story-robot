@@ -109,6 +109,9 @@ namespace :scraper do
       company.contacts.delete_all
 
       names.each_with_index do |full_name, index|
+        # ignore if there's no title
+        next if titles[index].nil?
+
         title = titles[index].text
 
         # ignoring board members and advisors
