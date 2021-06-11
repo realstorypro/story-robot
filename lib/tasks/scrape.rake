@@ -42,7 +42,7 @@ namespace :scraper do
     end
 
     def format_name(name)
-      name.downcase.gsub('"', '').gsub('\n', '').strip.gsub('.', '-').gsub(' ', '-').gsub(':', '-').gsub('(','').gsub(')','')
+      name.downcase.gsub('"', '').gsub('\n', '').strip.gsub('.', '-').gsub(' ', '-').gsub(':', '-').gsub('(','').gsub(')','').gsub(',','').gsub('&','')
     end
 
     def msg_slack(msg)
