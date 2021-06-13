@@ -12,24 +12,26 @@ namespace :close do
   task :segment_sync, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to sync customer.io segments to close.com'
 
-    customer_io_url = URI('https://beta-api.customer.io/v1/api/segments/8/membership')
+    # customer_io_url = URI('https://beta-api.customer.io/v1/api/segments/8/membership')
 
-    # gather emails of customers of in the segment
-    next_page = 0
-    until next_page.blank?
-      # do not paginate if we are just getting started
-      paginated_customer_io_url = if next_page == 0
-                                    URI(customer_io_url)
-                                  else
-                                    URI("#{customer_io_url}?start=#{next_page}")
-                                  end
-      customer_rsp = HTTParty.get(paginated_customer_io_url, headers: @customer_io_auth)
+    # # gather emails of customers of in the segment
+    # next_page = 0
+    # until next_page.blank?
+    #   # do not paginate if we are just getting started
+    #   paginated_customer_io_url = if next_page == 0
+    #                                 URI(customer_io_url)
+    #                               else
+    #                                 URI("#{customer_io_url}?start=#{next_page}")
+    #                               end
+    #   customer_rsp = HTTParty.get(paginated_customer_io_url, headers: @customer_io_auth)
 
-      customers = get_customers(customer_rsp['ids'])
+    #   customers = get_customers(customer_rsp['ids'])
 
-      next_page = customer_rsp.parsed_response['next']
-    end
+    #   next_page = customer_rsp.parsed_response['next']
+    # end
+    #
 
+    customers = get_customer_segment(8)
 
     # iterate through close.io contacts
     get_close_contacts.each do |contact|
@@ -102,6 +104,30 @@ namespace :close do
     contacts
   end
 
+  # returns a list of customers
+  def get_customer_segment(segment_id)
+    customer_io_url = URI("https://beta-api.customer.io/v1/api/segments/#{segment_id}/membership")
+
+    # gather emails of customers of in the segment
+    next_page = 0
+    until next_page.blank?
+      # do not paginate if we are just getting started
+      paginated_customer_io_url = if next_page == 0
+                                    URI(customer_io_url)
+                                  else
+                                    URI("#{customer_io_url}?start=#{next_page}")
+                                  end
+      customer_rsp = HTTParty.get(paginated_customer_io_url, headers: @customer_io_auth)
+
+      customers = get_customers(customer_rsp['ids'])
+
+      next_page = customer_rsp.parsed_response['next']
+    end
+
+    customers
+  end
+
+  # pulls up a customer.io customer based on the id passed.
   def get_customers(customer_ids)
     customer_emails = []
     customer_ids.each do |customer_id|
