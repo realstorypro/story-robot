@@ -50,6 +50,7 @@ namespace :close do
 
         ### CUSTOM FIELDS
         # Customer.Io Segment - custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW
+        # Needs Nurturing - custom.cf_N5Hnzwt4EMcuwGVZkBZuomSVBAMpo07Hzert2hG8QD1
 
         unless contact['custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW'] == '2-emails'
           msg_slack "#{contact['display_name']} has been nurtured"
@@ -70,7 +71,8 @@ namespace :close do
         end
 
         contact_payload = {
-          'custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW': '2-emails'
+          'custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW': '2-emails',
+          'custom.cf_N5Hnzwt4EMcuwGVZkBZuomSVBAMpo07Hzert2hG8QD1': 'No'
         }
 
         contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
