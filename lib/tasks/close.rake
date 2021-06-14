@@ -7,83 +7,53 @@
 namespace :close do
   @customer_io_auth = { "Authorization": "Bearer #{ENV['CUSTOMER_IO_API_KEY']}" }
   @close_api_base = "https://#{ENV['CLOSE_API_KEY']}:@api.close.com/api/v1/"
+  @segments = [
+    { number: 6,
+      name: 'Unsubscribed',
+      trumps: true,
+      add_task: false,
+      task_message: ''
+    },
+    { number: 7,
+      name: 'Active Subscribers',
+      trumps: false,
+      add_task: false,
+      task_message: '' },
+    { number: 12,
+      name: 'One Email Open',
+      trumps: false,
+      add_task: false,
+      task_message: '' },
+    { number: 8,
+      name: 'Two Email Opens',
+      trumps: false,
+      add_task: false,
+      task_message: 'Two emails opened, consider starting a sequence for' },
+    { number: 10,
+      name: 'Link Clicked',
+      trumps: false,
+      add_task: false,
+      task_message: 'Link clicked, consider starting a sequence for' },
+  ]
 
   desc 'syncs the segments from customer.io to close.com'
   task :segment_sync, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to sync customer.io segments to close.com'
 
-    # customer_io_url = URI('https://beta-api.customer.io/v1/api/segments/8/membership')
+    puts segment_rank(6, 'Two Email Opens')
+    puts segment_rank(10, 'Two Email Opens')
+    puts segment_rank(12, 'Two Email Opens')
+    puts segment_rank(7, 'Two Email Opens')
+    puts segment_rank(8, 'Two Email Opens')
 
-    # # gather emails of customers of in the segment
-    # next_page = 0
-    # until next_page.blank?
-    #   # do not paginate if we are just getting started
-    #   paginated_customer_io_url = if next_page == 0
-    #                                 URI(customer_io_url)
-    #                               else
-    #                                 URI("#{customer_io_url}?start=#{next_page}")
-    #                               end
-    #   customer_rsp = HTTParty.get(paginated_customer_io_url, headers: @customer_io_auth)
-
-    #   customers = get_customers(customer_rsp['ids'])
-
-    #   next_page = customer_rsp.parsed_response['next']
-    # end
-    #
-
-    customers = get_customer_segment(8)
+    # two_emails_customers = get_customer_segment(8)
+    # update_close_contacts get_close_contacts, two_emails_customers, {
+    #   segment_name: '2-emails',
+    #   needs_nurturing: 'No',
+    #   add_task: false
+    # }
 
     # iterate through close.io contacts
-    get_close_contacts.each do |contact|
-      contact['emails'].each do |email|
-        email_address = email['email']
-
-        found_match = false
-
-        customers.each do |customer|
-          next unless customer['attributes']['email'].include? email_address
-
-          found_match = true
-        end
-
-        next unless found_match
-
-        puts 'found a match for', contact
-
-        ### CUSTOM FIELDS
-        # Customer.Io Segment - custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW
-        # Needs Nurturing - custom.cf_N5Hnzwt4EMcuwGVZkBZuomSVBAMpo07Hzert2hG8QD1
-
-        unless contact['custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW'] == '2-emails'
-          msg_slack "#{contact['display_name']} has been nurtured"
-          task_payload = {
-            "_type": 'lead',
-            "lead_id": contact['lead_id'],
-            "assigned_to": 'user_iGM2Ik3TrAjWvGy01ET3vNkdd6nRyTFEw0Qi873OTkf',
-            "text": "Start a Sequence for #{contact['display_name']}",
-            "date": (Date.today).strftime('%F'),
-            "is_complete": false
-          }
-
-          # task_create_rsp = HTTParty.post(URI("#{@close_api_base}task/"),
-          #                                 {
-          #                                   headers: { 'Content-Type' => 'application/json' },
-          #                                   body: task_payload.to_json
-          #                                 })
-        end
-
-        contact_payload = {
-          'custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW': '2-emails',
-          'custom.cf_N5Hnzwt4EMcuwGVZkBZuomSVBAMpo07Hzert2hG8QD1': 'No'
-        }
-
-        contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
-                                          {
-                                            headers: { 'Content-Type' => 'application/json' },
-                                            body: contact_payload.to_json
-                                          })
-      end
-    end
   end
 
   # fetch all close.com contacts
@@ -102,6 +72,62 @@ namespace :close do
     end
 
     contacts
+  end
+
+  # update close contacts
+  def update_close_contacts(contacts, customers, options = {})
+
+    contacts.each do |contact|
+      contact['emails'].each do |email|
+        email_address = email['email']
+
+        found_match = false
+
+        customers.each do |customer|
+          next unless customer['attributes']['email'].include? email_address
+
+          found_match = true
+        end
+
+        next unless found_match
+
+        puts "found a match for segment: #{options[:segment_name]} ", contact
+
+        ### CUSTOM FIELDS
+        # Customer.Io Segment - custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW
+        # Needs Nurturing - custom.cf_N5Hnzwt4EMcuwGVZkBZuomSVBAMpo07Hzert2hG8QD1
+
+        # we only want to add task if the segment has changed
+        if options[:add_task] && contact['custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW'] != options[:segment_name]
+          msg_slack "#{contact['display_name']} has been nurtured"
+          task_payload = {
+            "_type": 'lead',
+            "lead_id": contact['lead_id'],
+            "assigned_to": 'user_iGM2Ik3TrAjWvGy01ET3vNkdd6nRyTFEw0Qi873OTkf',
+            "text": "Consider starting a sequence for #{contact['display_name']}",
+            "date": (Date.today).strftime('%F'),
+            "is_complete": false
+          }
+
+          # task_create_rsp = HTTParty.post(URI("#{@close_api_base}task/"),
+          #                                 {
+          #                                   headers: { 'Content-Type' => 'application/json' },
+          #                                   body: task_payload.to_json
+          #                                 })
+        end
+
+        contact_payload = {
+          'custom.cf_Rp7Z0tH5Jt2CeVU3uv1q02cRHfoIAl1ub8rDR9AiYHW': options[:segment_name],
+          'custom.cf_N5Hnzwt4EMcuwGVZkBZuomSVBAMpo07Hzert2hG8QD1': options[:needs_nurturing]
+        }
+
+        contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
+                                          {
+                                            headers: { 'Content-Type' => 'application/json' },
+                                            body: contact_payload.to_json
+                                          })
+      end
+    end
   end
 
   # returns a list of customers
@@ -138,6 +164,38 @@ namespace :close do
 
     customer_emails
   end
+
+  # decides whether a segment is superior, inferior or if there is no change
+  def segment_rank(segment_id, active_segment_name)
+    current_segment = @segments.select do |segment|
+      segment[:number] == segment_id
+    end
+    current_segment = current_segment.last
+
+    current_segment_index = @segments.index do |segment|
+      segment[:number] == segment_id
+    end
+
+    active_segment = @segments.select do |segment|
+      segment[:name] == active_segment_name
+    end
+    active_segment = active_segment.last
+
+    active_segment_index = @segments.index do |segment|
+      segment[:name] == active_segment_name
+    end
+
+    if current_segment == active_segment
+      'same'
+    elsif current_segment[:trumps]
+      'superior'
+    elsif current_segment_index > active_segment_index
+      'superior'
+    else
+      'inferior'
+    end
+  end
+
 
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
