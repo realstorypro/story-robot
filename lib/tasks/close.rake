@@ -45,6 +45,7 @@ namespace :close do
     puts segment_rank(12, 'Two Email Opens')
     puts segment_rank(7, 'Two Email Opens')
     puts segment_rank(8, 'Two Email Opens')
+    puts segment_rank(8, '')
 
     # two_emails_customers = get_customer_segment(8)
     # update_close_contacts get_close_contacts, two_emails_customers, {
@@ -188,6 +189,8 @@ namespace :close do
     if current_segment == active_segment
       'same'
     elsif current_segment[:trumps]
+      'superior'
+    elsif active_segment_index.nil?
       'superior'
     elsif current_segment_index > active_segment_index
       'superior'
