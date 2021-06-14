@@ -144,6 +144,7 @@ namespace :close do
     customer_io_url = URI("https://beta-api.customer.io/v1/api/segments/#{segment_id}/membership")
 
     # gather emails of customers of in the segment
+    customers = []
     next_page = 0
     until next_page.blank?
       # do not paginate if we are just getting started
@@ -154,7 +155,7 @@ namespace :close do
                                   end
       customer_rsp = HTTParty.get(paginated_customer_io_url, headers: @customer_io_auth)
 
-      customers = get_customers(customer_rsp['ids'])
+      customers.append(*get_customers(customer_rsp['ids']))
 
       next_page = customer_rsp.parsed_response['next']
     end
