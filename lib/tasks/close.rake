@@ -62,6 +62,50 @@ namespace :close do
     end
   end
 
+  desc 'backfill nurture dates from customer.io to close.com'
+  task :backfill_dates, [:number] => :environment do
+    customers = get_customer_segment(10)
+    contacts = get_close_contacts
+
+    customers.each do |customer|
+      customer_created_at = customer['attributes']['created_at']
+      customer_email = customer['attributes']['email']
+
+      contacts.each do |contact|
+        contact['emails'].each do |email|
+          email_address = email['email']
+
+          # finding the contact
+          found_match = false
+          customers.each do |customer|
+            next unless customer_email.include? email_address
+
+            found_match = true
+          end
+          next unless found_match
+
+          ### CUSTOM FIELDS
+          # Nurture Start Date - custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY
+
+          contact_payload = {
+            'custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY': customer_created_at
+          }
+
+          puts contact
+
+          contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
+                                            {
+                                              headers: { 'Content-Type' => 'application/json' },
+                                              body: contact_payload.to_json
+                                            })
+
+
+
+        end
+      end
+    end
+  end
+
   desc 'nurture un-nurtured close.com contacts in customer.io'
   task :nurture, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to nurture close.com contacts in customer.io'
