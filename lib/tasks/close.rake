@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-# require 'uri'
-# require 'net/http'
-# require 'openssl'
+require 'json'
 
 namespace :close do
   @customer_io_auth = { "Authorization": "Bearer #{ENV['CUSTOMER_IO_API_KEY']}" }
@@ -48,6 +46,50 @@ namespace :close do
       customer_contacts = get_customer_segment(segment[:number])
       close_contacts = get_close_contacts
       update_close_contacts(close_contacts, customer_contacts, segment)
+    end
+  end
+
+  desc 'nurture un-nurtured close.com contacts in customer.io'
+  task :nurture, [:number] => :environment do |_t, _args|
+    msg_slack 'preparing to nurture close.com contacts in customer.io'
+    close_contacts = get_close_nurture_contacts
+
+    $customerio = Customerio::Client.new(ENV['CUSTOMER_IO_SITE_ID'], ENV['CUSTOMER_IO_KEY'])
+
+    close_contacts.each do |contact|
+      email = contact['emails'].reject { |c| c['email'].nil? }[0]
+      if email.nil?
+        msg_slack "#{contact['name']} from doesn't have an email but needs nurturing! Please fix."
+        next
+      else
+        lead = get_close_lead(contact['lead_id'])
+
+        # assigning email to a new variable to keep things simple
+        the_email = email['email']
+        first_name = contact['name'].split(' ')[0]
+        last_name = contact['name'].split(' ')[1]
+        title = contact['title']
+        company = lead.parsed_response['display_name']
+        url = lead.parsed_response['url']
+
+        puts the_email, first_name, last_name, title, company, url
+        puts '----'
+
+        $customerio.identify(
+          id: the_email,
+          email: the_email,
+          created_at: (Date.today).strftime('%F'),
+          last_name: last_name,
+          first_name: first_name,
+          title: title,
+          company: company,
+          url: url,
+          source: 'close.com'
+        )
+
+        $customerio.track(the_email, 'begin nurture')
+      end
+
     end
   end
 
@@ -129,6 +171,25 @@ namespace :close do
 
       # we're iterating 100 contacts at a time.
       contact_offset += 100
+    end
+
+    contacts
+  end
+
+  def get_close_nurture_contacts
+    search_config = JSON.parse(File.read('./lib/tasks/nurture_filter.json'))
+    contacts = []
+
+    more_results = true
+    while more_results
+      close_rsp = HTTParty.post(URI("#{@close_api_base}data/search/"),
+                                {
+                                  headers: { 'Content-Type' => 'application/json' },
+                                  body: search_config.to_json
+                                })
+      contacts.append(*close_rsp.parsed_response['data'])
+      search_config["cursor"] = close_rsp.parsed_response['cursor']
+      more_results = false if close_rsp.parsed_response['cursor'].nil?
     end
 
     contacts
