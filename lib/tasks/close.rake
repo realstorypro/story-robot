@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'csv'
 
 namespace :close do
   @customer_io_auth = { "Authorization": "Bearer #{ENV['CUSTOMER_IO_API_KEY']}" }
@@ -93,6 +94,39 @@ namespace :close do
     end
   end
 
+  desc 'export close.com audience for linkedin'
+  task :export, [:number] => :environment do |_t, _args|
+    msg_slack 'preparing to export close.com for linkedin'
+    close_contacts = get_close_export_contacts
+
+    export_folder = "#{Dir.pwd}/linkedin_exports/"
+    timestamp = Time.now.to_i
+    headers = ["email", "firstname", "lastname", "jobtitle", "employeecompany"]
+
+    CSV.open("#{export_folder}/#{timestamp}.csv", 'w') do |csv|
+      csv << headers
+      close_contacts.each do |contact|
+        email = contact['emails'].reject { |c| c['email'].nil? }[0]
+        if email.nil?
+          msg_slack "#{contact['name']} from doesn't have an email but needs its for ads! Please fix."
+          next
+        else
+          lead = get_close_lead(contact['lead_id'])
+
+          # assigning email to a new variable to keep things simple
+          the_email = email['email']
+          first_name = contact['name'].split(' ')[0]
+          last_name = contact['name'].split(' ')[1]
+          title = contact['title']
+          company = lead.parsed_response['display_name']
+          csv << [the_email, first_name, last_name, title, company]
+        end
+      end
+    end
+
+
+  end
+
   # update close contacts
   def update_close_contacts(contacts, customers, segment)
 
@@ -176,8 +210,31 @@ namespace :close do
     contacts
   end
 
+  # TODO:
+  # Refactor get_close_nurture_contacts and get_close_export_contacts into
+  # A close_search function, and have it receive a filter file.
+  # Also move filter files somewhere better then the lib root folder.
   def get_close_nurture_contacts
     search_config = JSON.parse(File.read('./lib/tasks/nurture_filter.json'))
+    contacts = []
+
+    more_results = true
+    while more_results
+      close_rsp = HTTParty.post(URI("#{@close_api_base}data/search/"),
+                                {
+                                  headers: { 'Content-Type' => 'application/json' },
+                                  body: search_config.to_json
+                                })
+      contacts.append(*close_rsp.parsed_response['data'])
+      search_config["cursor"] = close_rsp.parsed_response['cursor']
+      more_results = false if close_rsp.parsed_response['cursor'].nil?
+    end
+
+    contacts
+  end
+
+  def get_close_export_contacts
+    search_config = JSON.parse(File.read('./lib/tasks/export_filter.json'))
     contacts = []
 
     more_results = true
