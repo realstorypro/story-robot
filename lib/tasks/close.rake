@@ -1,9 +1,15 @@
 # frozen_string_literal: true
 
+require 'close_api'
+require 'customer_api'
+
 require 'json'
 require 'csv'
 
 namespace :close do
+  @close_api = CloseApi.new
+  @customer_api = CustomerApi.new
+
   @customer_io_auth = { "Authorization": "Bearer #{ENV['CUSTOMER_IO_API_KEY']}" }
   @close_api_base = "https://#{ENV['CLOSE_API_KEY']}:@api.close.com/api/v1/"
   @segments = [
@@ -64,42 +70,32 @@ namespace :close do
 
   desc 'back fill nurture dates from customer.io to close.com'
   task :backfill_dates, [:number] => :environment do
-    @segments.each do |segment|
-      customers = get_customer_segment(segment[:number])
-      contacts = get_close_contacts
-      customers.each do |customer|
-        customer_created_at = customer['attributes']['created_at']
-        customer_email = customer['attributes']['email']
+    @customer_api.segments.each do |segment|
+      customer_contacts = @customer_api.get_segment(segment[:number])
+      close_contacts = @close_api.all_contacts
 
-        contacts.each do |contact|
-          contact['emails'].each do |email|
-            email_address = email['email']
+      customer_contacts.each do |customer_contact|
+        customer_email = customer_contact['attributes']['email']
 
-            # finding the contact
-            found_match = false
-            customers.each do |customer|
-              next unless customer_email.include? email_address
+        # we need to convert time from unix to regular
+        customer_created_at = Time.at(
+          customer_contact['timestamps']['cio_id']
+        ).strftime('%m/%d/%Y')
 
-              found_match = true
-            end
-            next unless found_match
+        close_contact = @close_api.find_contact(close_contacts, customer_email)
 
-            ### CUSTOM FIELDS
-            # Nurture Start Date - custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY
+        next unless close_contact
 
-            contact_payload = {
-              'custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY': customer_created_at
-            }
+        ### CUSTOM FIELDS
+        # Nurture Start Date - custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY
 
-            puts contact
+        contact_payload = {
+          'custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY': customer_created_at
+        }
 
-            contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
-                                              {
-                                                headers: { 'Content-Type' => 'application/json' },
-                                                body: contact_payload.to_json
-                                              })
-          end
-        end
+        response = @close_api.update_contact(close_contact['id'], contact_payload)
+
+        puts close_contact, customer_created_at, response, '------'
       end
     end
   end
@@ -258,6 +254,7 @@ namespace :close do
     contacts
   end
 
+  # searches close for a contact based on the json filter
   def search_close_contacts(json_file)
     search_config = JSON.parse(File.read("./lib/tasks/search/#{json_file}"))
     contacts = []
@@ -270,7 +267,7 @@ namespace :close do
                                   body: search_config.to_json
                                 })
       contacts.append(*close_rsp.parsed_response['data'])
-      search_config["cursor"] = close_rsp.parsed_response['cursor']
+      search_config['cursor'] = close_rsp.parsed_response['cursor']
       more_results = false if close_rsp.parsed_response['cursor'].nil?
     end
 
@@ -282,6 +279,7 @@ namespace :close do
     lead = HTTParty.get(URI(@close_api_base + "lead/#{lead_id}/"))
   end
 
+  # TODO: Get rid of this an use the customer_api file
   # returns a list of customers
   def get_customer_segment(segment_id)
     customer_io_url = URI("https://beta-api.customer.io/v1/api/segments/#{segment_id}/membership")
@@ -306,6 +304,7 @@ namespace :close do
     customers
   end
 
+  # TODO: Get rid of this an use the customer_api file
   # pulls up a customer.io customer based on the id passed.
   def get_customers(customer_ids)
     customer_emails = []
