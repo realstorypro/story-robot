@@ -12,7 +12,7 @@ namespace :close do
       trumps: true,
       needs_nurturing: 'No',
       add_task: false,
-      task_message: ''},
+      task_message: '' },
     { number: 7,
       name: 'Active Subscribers',
       trumps: false,
@@ -62,45 +62,43 @@ namespace :close do
     end
   end
 
-  desc 'backfill nurture dates from customer.io to close.com'
+  desc 'back fill nurture dates from customer.io to close.com'
   task :backfill_dates, [:number] => :environment do
-    customers = get_customer_segment(10)
-    contacts = get_close_contacts
+    @segments.each do |segment|
+      customers = get_customer_segment(segment[:number])
+      contacts = get_close_contacts
+      customers.each do |customer|
+        customer_created_at = customer['attributes']['created_at']
+        customer_email = customer['attributes']['email']
 
-    customers.each do |customer|
-      customer_created_at = customer['attributes']['created_at']
-      customer_email = customer['attributes']['email']
+        contacts.each do |contact|
+          contact['emails'].each do |email|
+            email_address = email['email']
 
-      contacts.each do |contact|
-        contact['emails'].each do |email|
-          email_address = email['email']
+            # finding the contact
+            found_match = false
+            customers.each do |customer|
+              next unless customer_email.include? email_address
 
-          # finding the contact
-          found_match = false
-          customers.each do |customer|
-            next unless customer_email.include? email_address
+              found_match = true
+            end
+            next unless found_match
 
-            found_match = true
+            ### CUSTOM FIELDS
+            # Nurture Start Date - custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY
+
+            contact_payload = {
+              'custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY': customer_created_at
+            }
+
+            puts contact
+
+            contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
+                                              {
+                                                headers: { 'Content-Type' => 'application/json' },
+                                                body: contact_payload.to_json
+                                              })
           end
-          next unless found_match
-
-          ### CUSTOM FIELDS
-          # Nurture Start Date - custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY
-
-          contact_payload = {
-            'custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY': customer_created_at
-          }
-
-          puts contact
-
-          contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
-                                            {
-                                              headers: { 'Content-Type' => 'application/json' },
-                                              body: contact_payload.to_json
-                                            })
-
-
-
         end
       end
     end
@@ -146,7 +144,6 @@ namespace :close do
 
         $customerio.track(the_email, 'begin nurture')
       end
-
     end
   end
 
@@ -179,13 +176,10 @@ namespace :close do
         end
       end
     end
-
-
   end
 
   # update close contacts
   def update_close_contacts(contacts, customers, segment)
-
     contacts.each do |contact|
       contact['emails'].each do |email|
         email_address = email['email']
@@ -237,13 +231,11 @@ namespace :close do
           'custom.cf_N5Hnzwt4EMcuwGVZkBZuomSVBAMpo07Hzert2hG8QD1': segment[:needs_nurturing]
         }
 
-
         contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{contact['id']}/"),
                                           {
                                             headers: { 'Content-Type' => 'application/json' },
                                             body: contact_payload.to_json
                                           })
-
       end
     end
   end
@@ -359,7 +351,6 @@ namespace :close do
       'inferior'
     end
   end
-
 
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
