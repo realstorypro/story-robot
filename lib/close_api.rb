@@ -5,7 +5,26 @@ class CloseApi
     @close_api_base = "https://#{ENV['CLOSE_API_KEY']}:@api.close.com/api/v1/"
   end
 
-  # finds contact based on the email address
+  def search(json_file)
+    search_config = JSON.parse(File.read("./lib/tasks/search/#{json_file}"))
+    contacts = []
+
+    more_results = true
+    while more_results
+      close_rsp = HTTParty.post(URI("#{@close_api_base}data/search/"),
+                                {
+                                  headers: { 'Content-Type' => 'application/json' },
+                                  body: search_config.to_json
+                                })
+      contacts.append(*close_rsp.parsed_response['data'])
+      search_config['cursor'] = close_rsp.parsed_response['cursor']
+      more_results = false if close_rsp.parsed_response['cursor'].nil?
+    end
+
+    contacts
+  end
+
+  # finds contact in a contact list based on the email address
   def find_contact(contacts, search_email)
     found = false
 
@@ -22,6 +41,11 @@ class CloseApi
       end
     end
     found
+  end
+
+  # fetch the lead from close.com based on the lead id
+  def find_lead(lead_id)
+    HTTParty.get(URI(@close_api_base + "lead/#{lead_id}/"))
   end
 
   # fetches all contacts from close.com

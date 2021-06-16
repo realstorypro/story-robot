@@ -103,7 +103,7 @@ namespace :close do
   desc 'nurture un-nurtured close.com contacts in customer.io'
   task :nurture, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to nurture close.com contacts in customer.io'
-    close_contacts = search_close_contacts('nurture.json')
+    close_contacts = @close_api.search('nurture.json')
 
     $customerio = Customerio::Client.new(ENV['CUSTOMER_IO_SITE_ID'], ENV['CUSTOMER_IO_KEY'])
 
@@ -113,7 +113,7 @@ namespace :close do
         msg_slack "#{contact['name']} from doesn't have an email but needs nurturing! Please fix."
         next
       else
-        lead = get_close_lead(contact['lead_id'])
+        lead = @close_api.find_lead(contact['lead_id'])
 
         # assigning email to a new variable to keep things simple
         the_email = email['email']
@@ -146,7 +146,7 @@ namespace :close do
   desc 'export close.com audience for linkedin'
   task :export, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to export close.com for linkedin'
-    close_contacts = search_close_contacts('export.json')
+    close_contacts = @close_api.search('export.json')
 
     export_folder = "#{Dir.pwd}/linkedin_exports/"
     timestamp = Time.now.to_i
@@ -160,7 +160,7 @@ namespace :close do
           msg_slack "#{contact['name']} from doesn't have an email but needs its for ads! Please fix."
           next
         else
-          lead = get_close_lead(contact['lead_id'])
+          lead = @close_api.find_lead(contact['lead_id'])
 
           # assigning email to a new variable to keep things simple
           the_email = email['email']
@@ -236,6 +236,7 @@ namespace :close do
     end
   end
 
+  # TODO: Get rid of this an use close_api file
   # fetch all close.com contacts
   def get_close_contacts
     has_more_contacts = true
@@ -254,26 +255,7 @@ namespace :close do
     contacts
   end
 
-  # searches close for a contact based on the json filter
-  def search_close_contacts(json_file)
-    search_config = JSON.parse(File.read("./lib/tasks/search/#{json_file}"))
-    contacts = []
-
-    more_results = true
-    while more_results
-      close_rsp = HTTParty.post(URI("#{@close_api_base}data/search/"),
-                                {
-                                  headers: { 'Content-Type' => 'application/json' },
-                                  body: search_config.to_json
-                                })
-      contacts.append(*close_rsp.parsed_response['data'])
-      search_config['cursor'] = close_rsp.parsed_response['cursor']
-      more_results = false if close_rsp.parsed_response['cursor'].nil?
-    end
-
-    contacts
-  end
-
+  # TODO: Get rid of this an use close_api file
   # fetch close lead
   def get_close_lead(lead_id)
     lead = HTTParty.get(URI(@close_api_base + "lead/#{lead_id}/"))
