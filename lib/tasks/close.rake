@@ -103,7 +103,7 @@ namespace :close do
   desc 'nurture un-nurtured close.com contacts in customer.io'
   task :nurture, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to nurture close.com contacts in customer.io'
-    close_contacts = search_close_contacts('nurture.json')
+    close_contacts = @close_api.search('nurture.json')
 
     $customerio = Customerio::Client.new(ENV['CUSTOMER_IO_SITE_ID'], ENV['CUSTOMER_IO_KEY'])
 
@@ -113,7 +113,7 @@ namespace :close do
         msg_slack "#{contact['name']} from doesn't have an email but needs nurturing! Please fix."
         next
       else
-        lead = get_close_lead(contact['lead_id'])
+        lead = @close_api.find_lead(contact['lead_id'])
 
         # assigning email to a new variable to keep things simple
         the_email = email['email']
@@ -274,6 +274,7 @@ namespace :close do
     contacts
   end
 
+  # TODO: Get rid of this an use close_api file
   # fetch close lead
   def get_close_lead(lead_id)
     lead = HTTParty.get(URI(@close_api_base + "lead/#{lead_id}/"))
