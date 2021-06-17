@@ -92,5 +92,40 @@ class CustomerApi
     customer_emails
   end
 
+  # decides whether a new segment is superior, inferior or no different
+  # from the current segment
+  def segment_rank(new_segment_id, active_segment_name)
+    current_segment = @segments.select do |segment|
+      segment[:number] == new_segment_id
+    end
+    current_segment = current_segment.last
+
+    current_segment_index = @segments.index do |segment|
+      segment[:number] == new_segment_id
+    end
+
+    active_segment = @segments.select do |segment|
+      segment[:name] == active_segment_name
+    end
+    active_segment = active_segment.last
+
+    active_segment_index = @segments.index do |segment|
+      segment[:name] == active_segment_name
+    end
+
+    if current_segment == active_segment
+      'same'
+    elsif current_segment[:trumps]
+      'superior'
+    elsif active_segment_index.nil?
+      'superior'
+    elsif current_segment_index > active_segment_index
+      'superior'
+    else
+      'inferior'
+    end
+  end
+
+
 
 end
