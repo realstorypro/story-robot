@@ -76,12 +76,39 @@ class CloseApi
 
   end
 
+  # fetches all tasks
+  def all_tasks
+    has_more_tasks = true
+    task_offset = 0
+
+    tasks = []
+    until has_more_tasks.blank?
+      close_rsp = HTTParty.get(URI(@close_api_base + "task/?_skip=#{task_offset}"))
+      tasks.append(*close_rsp.parsed_response['data'])
+      has_more_tasks = close_rsp.parsed_response['has_more']
+
+      # we're iterating 100 tasks at a time.
+      task_offset += 100
+    end
+
+    tasks
+  end
+
   # creates a task based on the payload
   def create_task(payload)
-    task_create_rsp = HTTParty.post(URI("#{@close_api_base}task/"),
-                                    {
-                                      headers: { 'Content-Type' => 'application/json' },
-                                      body: task_payload.to_json
-                                    })
+    HTTParty.post(URI("#{@close_api_base}task/"),
+                  {
+                    headers: { 'Content-Type' => 'application/json' },
+                    body: payload.to_json
+                  })
+  end
+
+  # updates an existing task
+  def update_task(task_id, payload)
+    HTTParty.put(URI("#{@close_api_base}task/#{task_id}/"),
+                 {
+                   headers: { 'Content-Type' => 'application/json' },
+                   body: payload.to_json
+                 })
   end
 end

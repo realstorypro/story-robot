@@ -107,6 +107,28 @@ namespace :close do
     end
   end
 
+  desc 'forward incomplete tasks for leads without opportunities'
+  task :forward_tasks, [:number] => :environment do
+    tasks = @close_api.all_tasks
+    tasks.each do |task|
+      next if task["is_complete"] == true
+
+      text = task["text"]
+      due_date = DateTime.parse(task["due_date"])
+      task_id = task["id"]
+
+      # if the date is today or past due
+      next unless due_date <= Date.today && (text.include?('Sub-Qualified') || text.include?('Potential'))
+
+      payload = {
+        "date": (Date.today + 30).strftime('%F')
+      }
+
+      @close_api.update_task(task_id, payload)
+    end
+  end
+
+
   desc 'nurture un-nurtured close.com contacts in customer.io'
   task :nurture, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to nurture close.com contacts in customer.io'
