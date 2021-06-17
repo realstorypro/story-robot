@@ -76,4 +76,12 @@ class CloseApi
 
   end
 
+  # creates a task based on the payload
+  def create_task(payload)
+    task_create_rsp = HTTParty.post(URI("#{@close_api_base}task/"),
+                                    {
+                                      headers: { 'Content-Type' => 'application/json' },
+                                      body: task_payload.to_json
+                                    })
+  end
 end
