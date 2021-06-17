@@ -10,8 +10,6 @@ namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
 
-  @close_api_base = "https://#{ENV['CLOSE_API_KEY']}:@api.close.com/api/v1/"
-
   desc 'syncs the segments from customer.io to close.com'
   task :segment_sync, [:number] => :environment do |_t, _args|
     # update close contacts
@@ -41,7 +39,7 @@ namespace :close do
         lead_status = lead['status_label']
 
         if customer_segment[:add_task] && lead_status != 'Bad Fit'
-          msg_slack "#{customer_segment[:task_message]} #{close_contact['display_name']} (#{lead_status})"
+          msg_slack "#{customer_segment[:task_message]} #{close_contact['display_name']} (#{close_contact['title']}) [#{lead_status}]"
 
           task_payload = {
             "_type": 'lead',
@@ -52,11 +50,7 @@ namespace :close do
             "is_complete": false
           }
 
-          task_create_rsp = HTTParty.post(URI("#{@close_api_base}task/"),
-                                          {
-                                            headers: { 'Content-Type' => 'application/json' },
-                                            body: task_payload.to_json
-                                          })
+          @close_api.create_task(task_payload)
         end
 
         contact_payload = {
@@ -65,13 +59,10 @@ namespace :close do
           'custom.cf_xhT1KuDwk1IzhNbtzkKoY9VocISAA29QqPkfmffJPFY': customer_created_at
         }
 
-        contact_update_rsp = HTTParty.put(URI(@close_api_base + "contact/#{close_contact['id']}/"),
-                                          {
-                                            headers: { 'Content-Type' => 'application/json' },
-                                            body: contact_payload.to_json
-                                          })
+        response = @close_api.update_contact(close_contact['id'], contact_payload)
 
-        puts contact_update_rsp
+        puts close_contact, customer_created_at, response, '------'
+
       end
     end
 
@@ -189,7 +180,6 @@ namespace :close do
       end
     end
   end
-
 
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
