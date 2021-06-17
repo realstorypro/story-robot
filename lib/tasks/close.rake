@@ -10,7 +10,6 @@ namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
 
-  @customer_io_auth = { "Authorization": "Bearer #{ENV['CUSTOMER_IO_API_KEY']}" }
   @close_api_base = "https://#{ENV['CLOSE_API_KEY']}:@api.close.com/api/v1/"
 
   desc 'syncs the segments from customer.io to close.com'
