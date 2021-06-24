@@ -43,72 +43,107 @@ class CloseApi
     found
   end
 
-  # fetch the lead from close.com based on the lead id
-  def find_lead(lead_id)
-    HTTParty.get(URI(@close_api_base + "lead/#{lead_id}/"))
+  # fetches a contact by id
+  def find_contact_by_id(id)
+    find('contact', id)
   end
 
-  # fetches all contacts from close.com
+  # fetch a singular lead
+  def find_lead(id)
+    find('lead', id)
+  end
+
+  # fetches all contacts
   def all_contacts
-    has_more_contacts = true
-    contact_offset = 0
-
-    contacts = []
-    until has_more_contacts.blank?
-      close_rsp = HTTParty.get(URI(@close_api_base + "contact/?_skip=#{contact_offset}"))
-      contacts.append(*close_rsp.parsed_response['data'])
-      has_more_contacts = close_rsp.parsed_response['has_more']
-
-      # we're iterating 100 contacts at a time.
-      contact_offset += 100
-    end
-
-    contacts
-  end
-
-  # updates the contact based on the contact id and payload (passed as hash)
-  def update_contact(contact_id, payload)
-    HTTParty.put(URI(@close_api_base + "contact/#{contact_id}/"),
-                 {
-                   headers: { 'Content-Type' => 'application/json' },
-                   body: payload.to_json
-                 })
-
+    all('contact')
   end
 
   # fetches all tasks
   def all_tasks
-    has_more_tasks = true
-    task_offset = 0
-
-    tasks = []
-    until has_more_tasks.blank?
-      close_rsp = HTTParty.get(URI(@close_api_base + "task/?_skip=#{task_offset}"))
-      tasks.append(*close_rsp.parsed_response['data'])
-      has_more_tasks = close_rsp.parsed_response['has_more']
-
-      # we're iterating 100 tasks at a time.
-      task_offset += 100
-    end
-
-    tasks
+    all('task')
   end
 
-  # creates a task based on the payload
+  # fetches all sequences
+  def all_sequence
+    all('sequence')
+  end
+
+  # creates a new task
   def create_task(payload)
-    HTTParty.post(URI("#{@close_api_base}task/"),
+    create('task', payload)
+  end
+
+  # updates existing contact
+  def update_contact(id, payload)
+    update('contact', id, payload)
+  end
+
+  # updates an existing task
+  def update_task(id, payload)
+    update('task', id, payload)
+  end
+
+  # finds all sequence subscriptions
+  # pass in the sequence id
+  def all_sequence_subscriptions(id)
+    has_more_response = true
+    response_offset = 0
+
+    response = []
+    until has_more_response.blank?
+      close_rsp = HTTParty.get(URI(@close_api_base + "sequence_subscription/?sequence_id=#{id}&_skip=#{response_offset}"))
+      response.append(*close_rsp.parsed_response['data'])
+      has_more_response = close_rsp.parsed_response['has_more']
+
+      # we're iterating 100 responses at a time.
+      response_offset += 100
+    end
+
+    response
+  end
+
+  private
+
+  # finds an item of a particular find
+  def find(kind, id)
+    HTTParty.get(URI(@close_api_base + "#{kind}/#{id}/"))
+  end
+
+  # creates an item
+  # the payload must be passed as a hash
+  def create(kind, payload)
+    HTTParty.post(URI("#{@close_api_base}#{kind}/"),
                   {
                     headers: { 'Content-Type' => 'application/json' },
                     body: payload.to_json
                   })
   end
 
-  # updates an existing task
-  def update_task(task_id, payload)
-    HTTParty.put(URI("#{@close_api_base}task/#{task_id}/"),
+  # updates singular item
+  # the payload must be passed as hash
+  def update(kind, id, payload)
+    HTTParty.put(URI("#{@close_api_base}#{kind}/#{id}/"),
                  {
                    headers: { 'Content-Type' => 'application/json' },
                    body: payload.to_json
                  })
+  end
+
+  # fetches all of a kind
+  def all(kind)
+    has_more_response = true
+    response_offset = 0
+
+    response = []
+    until has_more_response.blank?
+      close_rsp = HTTParty.get(URI(@close_api_base + "#{kind}/?_skip=#{response_offset}"))
+      response.append(*close_rsp.parsed_response['data'])
+      has_more_response = close_rsp.parsed_response['has_more']
+
+      # we're iterating 100 responses at a time.
+      response_offset += 100
+    end
+
+    response
   end
 end

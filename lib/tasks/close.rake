@@ -111,11 +111,11 @@ namespace :close do
   task :forward_tasks, [:number] => :environment do
     tasks = @close_api.all_tasks
     tasks.each do |task|
-      next if task["is_complete"] == true
+      next if task['is_complete'] == true
 
-      text = task["text"]
-      due_date = DateTime.parse(task["due_date"])
-      task_id = task["id"]
+      text = task['text']
+      due_date = DateTime.parse(task['due_date'])
+      task_id = task['id']
 
       # if the date is today or past due
       next unless due_date <= Date.today && (text.include?('Sub-Qualified') || text.include?('Potential'))
@@ -127,7 +127,6 @@ namespace :close do
       @close_api.update_task(task_id, payload)
     end
   end
-
 
   desc 'nurture un-nurtured close.com contacts in customer.io'
   task :nurture, [:number] => :environment do |_t, _args|
@@ -201,6 +200,43 @@ namespace :close do
         end
       end
     end
+  end
+
+  desc 'move opp to retry if seq is completed'
+  task :retry_ops, [:number] => :environment do
+    # 1. get a list of all sequences
+    sequences = @close_api.all_sequence
+
+    # 2. run a sequence loop
+    sequences.each do |sequence|
+      #next unless sequence['status'] == 'active'
+
+      subscriptions = @close_api.all_sequence_subscriptions(sequence['id'])
+
+      subscriptions.each do |subscription|
+
+        # 3. go through all the finished and paused subscriptions
+        next unless subscription['status'].in? %w[finished paused]
+
+        # 4. fetch the associated contact
+        contact = @close_api.find_contact_by_id(subscription['contact_id'])
+
+        # 5. check if the contact is on the do not sequence list
+        next if contact['custom.cf_iuK23d7LKjVFuR9z52ddWRHEjCkkHZ23xCRzLvGIP83'] == 'Yes'
+
+        lead = @close_api.find_lead(contact['lead_id'])
+
+
+        puts lead, '****'
+      end
+      puts sequence['name'], subscriptions.count, '----'
+    end
+
+    # 3. get a list of contacts that have completed the sequence and DO NOT HAVE the don't sequence field
+    # 4. check that stage isn't demo or prop sent
+    # 5. check that the op status isn't won
+    # 6. set the contact status do don't sequence
+    # 7. move the opportunity to retry stage
   end
 
   def msg_slack(msg)
