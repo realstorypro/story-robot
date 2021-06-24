@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class CloseApi
   def initialize
     @close_api_base = "https://#{ENV['CLOSE_API_KEY']}:@api.close.com/api/v1/"
@@ -25,7 +23,7 @@ class CloseApi
   end
 
   # finds contact in a contact list based on the email address
-  def find_contact(contacts, search_email)
+  def find_in_contacts(contacts, search_email)
     found = false
 
     # contacts have multiple emails, we go through all of them looking for
@@ -43,72 +41,121 @@ class CloseApi
     found
   end
 
-  # fetch the lead from close.com based on the lead id
-  def find_lead(lead_id)
-    HTTParty.get(URI(@close_api_base + "lead/#{lead_id}/"))
+  # fetches a singular contact
+  def find_contact(id)
+    find('contact', id)
   end
 
-  # fetches all contacts from close.com
+  # fetch a singular lead
+  def find_lead(id)
+    find('lead', id)
+  end
+
+  # fetches all contacts
   def all_contacts
-    has_more_contacts = true
-    contact_offset = 0
-
-    contacts = []
-    until has_more_contacts.blank?
-      close_rsp = HTTParty.get(URI(@close_api_base + "contact/?_skip=#{contact_offset}"))
-      contacts.append(*close_rsp.parsed_response['data'])
-      has_more_contacts = close_rsp.parsed_response['has_more']
-
-      # we're iterating 100 contacts at a time.
-      contact_offset += 100
-    end
-
-    contacts
-  end
-
-  # updates the contact based on the contact id and payload (passed as hash)
-  def update_contact(contact_id, payload)
-    HTTParty.put(URI(@close_api_base + "contact/#{contact_id}/"),
-                 {
-                   headers: { 'Content-Type' => 'application/json' },
-                   body: payload.to_json
-                 })
-
+    all('contact')
   end
 
   # fetches all tasks
   def all_tasks
-    has_more_tasks = true
-    task_offset = 0
-
-    tasks = []
-    until has_more_tasks.blank?
-      close_rsp = HTTParty.get(URI(@close_api_base + "task/?_skip=#{task_offset}"))
-      tasks.append(*close_rsp.parsed_response['data'])
-      has_more_tasks = close_rsp.parsed_response['has_more']
-
-      # we're iterating 100 tasks at a time.
-      task_offset += 100
-    end
-
-    tasks
+    all('task')
   end
 
-  # creates a task based on the payload
+  # fetches all sequences
+  def all_sequence
+    all('sequence')
+  end
+
+  # fetches all opportunities
+  def all_opportunities
+    all('opportunity')
+  end
+
+  # creates a new task
   def create_task(payload)
-    HTTParty.post(URI("#{@close_api_base}task/"),
+    create('task', payload)
+  end
+
+  # updates existing contact
+  def update_contact(id, payload)
+    update('contact', id, payload)
+  end
+
+  # updates an existing task
+  def update_task(id, payload)
+    update('task', id, payload)
+  end
+
+  # update an existing opportunity
+  def update_opportunity(id, payload)
+    update('opportunity', id, payload)
+  end
+
+  # finds all sequence subscriptions
+  # pass in the sequence id
+  def all_sequence_subscriptions(id)
+    all 'sequence_subscription', 'sequence_id': id
+  end
+
+  # finds all opportunities for a lead
+  # pass in the lead id
+  def all_lead_opportunities(id)
+    all 'opportunity', 'lead_id': id
+  end
+
+  private
+
+  # finds an item of a particular find
+  def find(kind, id)
+    HTTParty.get(URI(@close_api_base + "#{kind}/#{id}/"))
+  end
+
+  # creates an item
+  # the payload must be passed as a hash
+  def create(kind, payload)
+    HTTParty.post(URI("#{@close_api_base}#{kind}/"),
                   {
                     headers: { 'Content-Type' => 'application/json' },
                     body: payload.to_json
                   })
   end
 
-  # updates an existing task
-  def update_task(task_id, payload)
-    HTTParty.put(URI("#{@close_api_base}task/#{task_id}/"),
+  # updates singular item
+  # the payload must be passed as hash
+  def update(kind, id, payload)
+    HTTParty.put(URI("#{@close_api_base}#{kind}/#{id}/"),
                  {
                    headers: { 'Content-Type' => 'application/json' },
                    body: payload.to_json
                  })
+  end
+
+  # fetches all of a kind
+  # @param [Hash] keys - additional parameters to be used in url string
+  def all(kind, keys = {})
+    url_string = ''
+
+    unless keys.empty?
+      keys.each do |key, value|
+        url_string.concat "#{key}=#{value}&"
+      end
+    end
+
+    url_string.concat '_skip'
+
+    has_more_response = true
+    response_offset = 0
+
+    response = []
+    until has_more_response.blank?
+      close_rsp = HTTParty.get(URI(@close_api_base + "#{kind}/?#{url_string}=#{response_offset}"))
+      response.append(*close_rsp.parsed_response['data'])
+      has_more_response = close_rsp.parsed_response['has_more']
+
+      # we're iterating 100 responses at a time.
+      response_offset += 100
+    end
+
+    response
   end
 end
