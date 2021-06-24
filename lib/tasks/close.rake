@@ -20,7 +20,7 @@ namespace :close do
           customer_contact['timestamps']['cio_id']
         ).strftime('%m/%d/%Y')
 
-        close_contact = @close_api.find_contact(close_contacts, customer_email)
+        close_contact = @close_api.find_in_contacts(close_contacts, customer_email)
 
         next unless close_contact
 
@@ -89,7 +89,7 @@ namespace :close do
           customer_contact['timestamps']['cio_id']
         ).strftime('%m/%d/%Y')
 
-        close_contact = @close_api.find_contact(close_contacts, customer_email)
+        close_contact = @close_api.find_in_contacts(close_contacts, customer_email)
 
         next unless close_contact
 
@@ -219,24 +219,36 @@ namespace :close do
         next unless subscription['status'].in? %w[finished paused]
 
         # 4. fetch the associated contact
-        contact = @close_api.find_contact_by_id(subscription['contact_id'])
+        contact = @close_api.find_contact(subscription['contact_id'])
 
         # 5. check if the contact is on the do not sequence list
         next if contact['custom.cf_iuK23d7LKjVFuR9z52ddWRHEjCkkHZ23xCRzLvGIP83'] == 'Yes'
 
         lead = @close_api.find_lead(contact['lead_id'])
+        opportunities = @close_api.all_lead_opportunities(contact['lead_id'])
 
+        # 6. we're only assigning one opportunity per lead, and thus
+        # are only looking at the last opportunity
+        opportunity = opportunities.last
 
-        puts lead, '****'
+        # 7. we only want to perform the action on active opportunities
+        next unless opportunity['status_type'] == 'active'
+
+        # 8. don't do anything if the opportunity is in the 'in-progress' stages
+        next if opportunity['status_display_name'].in? ['Demo Completed', 'Proposal Sent']
+
+        # 9. update opportunity status to 'retry'
+        @close_api.update_opportunity opportunity['id'],
+                                      "status_id": 'stat_1ZSp1FHVMLH8Ezmm1ZE6Y6akoYu5r0OspSvUUDL2jrC'
+
+        # 10. set the contact to the do not sequence
+        @close_api.update_contact contact['id'],
+                                  "custom.cf_iuK23d7LKjVFuR9z52ddWRHEjCkkHZ23xCRzLvGIP83": 'Yes'
+
+        puts opportunity, '****'
       end
       puts sequence['name'], subscriptions.count, '----'
     end
-
-    # 3. get a list of contacts that have completed the sequence and DO NOT HAVE the don't sequence field
-    # 4. check that stage isn't demo or prop sent
-    # 5. check that the op status isn't won
-    # 6. set the contact status do don't sequence
-    # 7. move the opportunity to retry stage
   end
 
   def msg_slack(msg)
