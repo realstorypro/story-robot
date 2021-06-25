@@ -209,12 +209,11 @@ namespace :close do
 
     # 2. run a sequence loop
     sequences.each do |sequence|
-      #next unless sequence['status'] == 'active'
+      next unless sequence['status'] == 'active'
 
       subscriptions = @close_api.all_sequence_subscriptions(sequence['id'])
 
       subscriptions.each do |subscription|
-
         # 3. go through all the finished and paused subscriptions
         next unless subscription['status'].in? %w[finished paused]
 
