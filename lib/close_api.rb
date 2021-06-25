@@ -66,11 +66,6 @@ class CloseApi
     all('sequence')
   end
 
-  # fetches all opportunities
-  def all_opportunities
-    all('opportunity')
-  end
-
   # creates a new task
   def create_task(payload)
     create('task', payload)
@@ -86,22 +81,50 @@ class CloseApi
     update('task', id, payload)
   end
 
-  # update an existing opportunity
-  def update_opportunity(id, payload)
-    update('opportunity', id, payload)
-  end
-
   # finds all sequence subscriptions
   # pass in the sequence id
   def all_sequence_subscriptions(id)
     all 'sequence_subscription', 'sequence_id': id
   end
 
+  ######  **** Opportunities **** ######
+
+  # fetches all opportunities
+  def all_opportunities
+    all('opportunity')
+  end
+
+  # update an existing opportunity
+  # @param opportunity_id [Integer] the id of the opportunity
+  # @param payload [Hash] the payload containing updated fields
+  def update_opportunity(opportunity_id, payload)
+    update('opportunity', opportunity_id, payload)
+  end
+
   # finds all opportunities for a lead
   # pass in the lead id
-  def all_lead_opportunities(id)
-    all 'opportunity', 'lead_id': id
+  def all_lead_opportunities(lead_id)
+    all 'opportunity', 'lead_id': lead_id
   end
+
+  # @param from_status [String] status from which we're transferring opps.
+  # @param to_status [String] status to which we're transferring opps.
+  # @return [Boolean] returns true once everything is done
+  def transfer_opportunities(from_status, to_status)
+    opportunities = all_opportunities
+    opportunities.each do |opportunity|
+      next unless opportunity['status_id'] == from_status
+
+      payload = {
+        status_id: to_status
+      }
+      update_opportunity opportunity['id'], payload
+    end
+
+    true
+  end
+
+
 
   private
 
