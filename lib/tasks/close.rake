@@ -236,9 +236,9 @@ namespace :close do
         # 8. don't do anything if the opportunity is in the 'in-progress' stages
         next if opportunity['status_display_name'].in? ['Demo Completed', 'Proposal Sent']
 
-        # 9. update opportunity status to 'retry'
+        # 9. update opportunity status to 'retry' pipeline
         @close_api.update_opportunity opportunity['id'],
-                                      "status_id": 'stat_1ZSp1FHVMLH8Ezmm1ZE6Y6akoYu5r0OspSvUUDL2jrC'
+                                      "status_id": 'stat_ndxTbqCzVFX1KQVdc0d7as93ZdkVKCbjaHGY2dFjCA0'
 
         # 10. set the contact to the do not sequence
         @close_api.update_contact contact['id'],

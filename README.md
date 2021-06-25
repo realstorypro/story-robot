@@ -18,14 +18,14 @@ and put in your search criteria.
 rake list:build
 ```
 - It will ask you a bunch of questions about the search. The answers will be stored,
-and uploaded into Salesforce. 
+and uploaded into Customer.IO. 
 
 - __The most important question it will ask you is a list number. It will become the folder where the list is stored, and is used by the importer__. 
 
 - The list builder is watching your clipboard. Select all of the companies on the results page (Cmd + A) and copy them.
 Keep moving forward in the list until you are done.
    
-- Once the list has been built its time to scrape to impor the list into the database.
+- Once the list has been built its time to scrape to import the list into the database.
 
 
 ### 3. Import the list
@@ -38,12 +38,4 @@ rake import:list[2]
 Execute the scraper by invoking the scraper:scrape command, with a list number.
 ```bash
 rake scraper:scrape[2]
-```
-
-### 5. Upload to Airtable for further processing
-- Execute upload:contacts with a number of contacts being uploaded.
-- Don't upload too many contacts at once in case of error. Keep it around 100 and 200.
-
-```bash
-rake upload:contacts[200]
 ```
