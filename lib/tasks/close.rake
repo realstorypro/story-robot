@@ -209,7 +209,7 @@ namespace :close do
 
     # 2. run a sequence loop
     sequences.each do |sequence|
-      #next unless sequence['status'] == 'active'
+      next unless sequence['status'] == 'active'
 
       subscriptions = @close_api.all_sequence_subscriptions(sequence['id'])
 
