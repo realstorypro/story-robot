@@ -101,12 +101,13 @@ class CloseApi
     update('opportunity', opportunity_id, payload)
   end
 
-  # finds all opportunities for a lead
-  # pass in the lead id
+  # Finds all opportunities for a given lead
+  # @param lead_id [Integer] the id of the lead
   def all_lead_opportunities(lead_id)
     all 'opportunity', 'lead_id': lead_id
   end
 
+  # Takes care of transferring opportunities from one status to another
   # @param from_status [String] status from which we're transferring opps.
   # @param to_status [String] status to which we're transferring opps.
   # @return [Boolean] returns true once everything is done
@@ -128,7 +129,9 @@ class CloseApi
 
   private
 
-  # finds an item of a particular find
+  # Retrieves a singular item of a particular find
+  # @param kind [String] a kind of an item (i.e lead or contact)
+  # @param id [Integer] an id of an item we're retrieving
   def find(kind, id)
     HTTParty.get(URI(@close_api_base + "#{kind}/#{id}/"))
   end
