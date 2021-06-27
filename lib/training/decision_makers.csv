@@ -1,4 +1,4 @@
-email,firstname,lastname,Job Title,Company,
+email,firstname,lastname,title,company,decisionmaker
 thibault@ecommerce-nation.fr,Thibault,Herpin,SEO Manager,E-commerce Nation,o
 clement@ecommerce-nation.fr,Clément,Goubon,Market Sales Specialist,E-commerce Nation,o
 camille@ecommerce-nation.fr,Camille,Gaspari,Content Manager France,E-commerce Nation,o
@@ -391,7 +391,7 @@ som@gumgum.com,Som,Puangladda,VP of Global Marketing,GumGum,x
 pschraeder@gumgum.com,Phil,Schraeder,CEO,GumGum,x
 adam@gumgum.com,Adam,Schenkel,"SVP, Global Commercial Development",GumGum,o
 kweiner@gumgum.com,Ken,Weiner,CTO,GumGum,x
-mwilson@cednc.org,Miriam,Wilson,Development Director,CED,
+mwilson@cednc.org,Miriam,Wilson,Development Director,CED,o
 jbigelow@cednc.org,Jay,Bigelow,Director of Entrepreneurship,CED,o
 rcostello@cednc.org,Robin,Costello,Senior Development Manager,CED,o
 krowell@cednc.org,Kelly,Rowell,CEO,CED,x
@@ -887,8 +887,6 @@ david@moz.com,David,Joslin,Systems Engineer,Moz,o
 peter.meyers@moz.com,Peter,Meyers,Marketing Scientist,Moz,o
 britney@moz.com,Britney,Muller,SEO & Content Architect,Moz,x
 paul@venturebeat.com,Paul,Sawers,European Correspondent,VentureBeat,o
-jonathan@bioliteenergy.com,Jonathan,Cedar,,BioLite,o
-s.saha@perkville.com,Sunil,Saha,,Perkville,o
 jeffery.anderson@springventuregroup.com,Jeffery,Anderson,Chief Operating Officer & Co-Founder,Spring Venture Group,x
 amina.pasha@thrivemarket.com,Amina,Pasha,Chief Marketing Officer,Thrive Market,x
 naveen.gupta@innovaccer.com,Naveen,Gupta,CFO,Innovaccer,o
@@ -980,7 +978,7 @@ jonathan.morgan@openmarket.com,Jonathan,Morgan,CEO,OpenMarket,x
 jason@wagwalking.com,Jason,Meltzer,"Co Founder, Chief Dog Officer & 1st CEO",Wag,x
 zperret@plaid.com,Zachary,Perret,Co-founder & CEO,Plaid,x
 katia.beauchamp@birchbox.com,Katia,Beauchamp,Co-Founder and CEO,Birchbox,x
-mhanley@duo.com,Mike,Hanley,VP of Security,Duo Security,p
+mhanley@duo.com,Mike,Hanley,VP of Security,Duo Security,o
 esager@plaid.com,Eric,Sager,COO,Plaid,x
 ivan.rylach@checkr.com,Ivan,Rylach,Staff Software Engineer,Checkr,o
 dfromm@barkleyus.com,Dan,Fromm,President & COO,Barkley,x
@@ -1044,14 +1042,14 @@ alexa.kaminer@soul-cycle.com,Alexa,Kaminer,Digital Marketing Manager,SoulCycle,x
 jmcmillin@lyft.com,Jesse,McMillen,"VP, Creative Director",Lyft,x
 lgirard@wi.mit.edu,Lisa,Gerard,Director of Strategic Communications,Whitehead Institute for Biomedical Research,x
 rar@wi.mit.edu,Roger,Roach,Director of IT,Whitehead Institute for Biomedical Research,o
-mpelayo@matterport.com,Mia,Pelayo,Marketing & Social Media Manager,Matterport,c
-lindsay.moore@oakstreethealth.com,Lindsay,Moore,Director of Marketing,Oak Street Health,c
-corey.thomas@rapid7.com,Corey,Thomas,CEO,Rapid7,c
-dan@letsdeel.com,Dan,Westgarth,COO,Deel,c
-thammond@ascap.com,Timothy,Hammond,Senior Director of Marketing,ASCAP,c
-greg.balogh@bms.com,Greg,Balogh,Global Digital Marketing,Bristol-Myers Squibb,c
-denise.broady@appian.com,Denise,Broady,CMO,Appian,c
-laura.westerman@mumsnet.com,Laura,Westerman,Deputy Head of Editorial Content,Mumsnet,c
+mpelayo@matterport.com,Mia,Pelayo,Marketing & Social Media Manager,Matterport,x
+lindsay.moore@oakstreethealth.com,Lindsay,Moore,Director of Marketing,Oak Street Health,x
+corey.thomas@rapid7.com,Corey,Thomas,CEO,Rapid7,x
+dan@letsdeel.com,Dan,Westgarth,COO,Deel,x
+thammond@ascap.com,Timothy,Hammond,Senior Director of Marketing,ASCAP,x
+greg.balogh@bms.com,Greg,Balogh,Global Digital Marketing,Bristol-Myers Squibb,x
+denise.broady@appian.com,Denise,Broady,CMO,Appian,x
+laura.westerman@mumsnet.com,Laura,Westerman,Deputy Head of Editorial Content,Mumsnet,x
 jane.brady@mumsnet.com,Jane,Brady,Head of Brand Partnerships,Mumsnet,x
 lorna@mumsnet.com,Lorna,T.,Head of Community Management,Mumsnet,x
 akay@upgrade.com,Avia,Kay,Senior VP Marketing,Upgrade,x
@@ -1103,7 +1101,7 @@ bbrannon@onetrust.com,Blake,Brannon,CTO,OneTrust,x
 michael.mccune@cynergistek.com,Mike,McCune,"Director of Client Services, West",CynergisTek,o
 nels.olson@kornferry.com,Nels,Olson,"Vice Chairman and Co-Leader, Board & CEO Services Practice",Korn Ferry International,o
 gbird@extremenetworks.com,Geoff,Bird,"Director, EMEA & APAC Inside Sales",Extreme Networks,o
-sjohnson@care-view.com,Steven,Johnson,President & CEO,CareView Communications, 
+sjohnson@care-view.com,Steven,Johnson,President & CEO,CareView Communications,x
 julie.vargas@averydennison.com,Julie,Vargas,"Director, Digital Solutions",Avery Dennison,x
 vladi.delsoglio@srax.com,Vladi,Delsoglio,Chief Creative Officer,SRAX,x
 chris.oneil@srax.com,Chris,O'Neil,"Executive Vice President, Engineering",SRAX,o
@@ -1570,7 +1568,7 @@ r.devlin@transparentbusiness.com,Richard,Devlin,General Counsel,TransparentBusin
 bomlor@launchsquad.com,Brian,Omlor,Creative Lead,LaunchSquad,o
 bweiner@launchsquad.com,Brett,Weiner,Partner,LaunchSquad,o
 gabriel@fieldpulse.com,Gabriel,Pinchev,CEO,FieldPulse,x
-orly@donorschoose.org,Orly,Michaeli,Partnerships Manager,DonorsChoose,
+orly@donorschoose.org,Orly,Michaeli,Partnerships Manager,DonorsChoose,o
 oliver@donorschoose.org,Oliver,Hurst-Hiller,Chief Technology Officer & EVP Product,DonorsChoose,x
 katie@donorschoose.org,Katie,Bisbee,Chief Marketing Officer,DonorsChoose,x
 ann@thegaragegroup.com,Ann,Thompson,Co -Founder,The Garage Group,x
@@ -1593,8 +1591,6 @@ jess.stipe@moz.com,Jess,Stipe,Executive Assistant,Moz,o
 matt@venturebeat.com,Matt,Marshall,CEO,VentureBeat,x
 alexei@venturebeat.com,Alexei,Ilinykh,Director Product & Engineering,VentureBeat,o
 stewart@venturebeat.com,Stewart,Rogers,Director of Marketing Technology,VentureBeat,x
-j.jue@triblio.com,Jason,Jue,,Triblio,o
-ann.wixley@wmglobal.com,Ann,Wixley,,WaveMaker,o
 josemontero@velocityglobal.com,Jose,Montero,COO,Velocity Global,x
 ryanmedine@velocityglobal.com,Ryan,Medine,VP Marketing,Velocity Global,x
 everett.butler@affirm.com,Everett,Butler,Senior Director of Growth and Integrated Marketing,Affirm,x

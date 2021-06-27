@@ -2,6 +2,7 @@
 
 require 'close_api'
 require 'customer_api'
+require 'ai'
 
 require 'json'
 require 'csv'
@@ -9,6 +10,7 @@ require 'csv'
 namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
+  @ai = Ai.new
 
   desc 'syncs the segments from customer.io to close.com'
   task :segment_sync, [:number] => :environment do |_t, _args|
@@ -247,6 +249,33 @@ namespace :close do
         puts opportunity, '****'
       end
       puts sequence['name'], subscriptions.count, '----'
+    end
+  end
+
+  desc 'tag decision makers'
+  task :tag_decision_makers => :environment do
+
+    @ai.train_decision_makers
+    contacts = @close_api.all_contacts
+    contacts.each do |contact|
+      next if contact['title'].blank?
+
+      # custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh - Decision Maker field in Close w/ Yes & No values
+      next unless contact['custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh'].blank?
+
+      contact_payload = if @ai.decision_maker? contact['title']
+                          {
+                            'custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh': 'Yes'
+                          }
+                        else
+                          {
+                            'custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh': 'No'
+                          }
+                        end
+
+      @close_api.update_contact(contact['id'], contact_payload)
+
+      puts "#{contact['title']} - #{@ai.decision_maker?(contact['title'])}", "***"
     end
   end
 
