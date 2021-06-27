@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'close_api'
+require 'custom_fields'
 require 'customer_api'
 require 'ai'
 
@@ -10,6 +11,7 @@ require 'csv'
 namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
+  @fields = CustomFields.new
   @ai = Ai.new
 
   desc 'syncs the segments from customer.io to close.com'
@@ -260,22 +262,51 @@ namespace :close do
     contacts.each do |contact|
       next if contact['title'].blank?
 
-      # custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh - Decision Maker field in Close w/ Yes & No values
-      next unless contact['custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh'].blank?
+      next unless contact[@fields.get(:decision_maker)].blank?
 
-      contact_payload = if @ai.decision_maker? contact['title']
-                          {
-                            'custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh': 'Yes'
-                          }
-                        else
-                          {
-                            'custom.cf_6evh1292hlGTL0FqvkAXb3ROE6JBX1ZmqADApRpAndh': 'No'
-                          }
-                        end
+      contact_payload = {}
+      contact_payload[@fields.get(:decision_maker)] = if @ai.decision_maker? contact['title']
+                                                        'Yes'
+                                                      else
+                                                        'No'
+                                                      end
 
       @close_api.update_contact(contact['id'], contact_payload)
 
-      puts "#{contact['title']} - #{@ai.decision_maker?(contact['title'])}", "***"
+      puts "#{contact['title']} - #{@ai.decision_maker?(contact['title'])}", '***'
+    end
+  end
+
+  desc 'calculate available decision makers per lead'
+  task :calc_decision_makers => :environment do
+    leads = @close_api.all_leads
+    contacts = @close_api.all_contacts
+
+    leads.each do |lead|
+      # find all lead contacts
+      lead_contacts = contacts.select do |contact|
+        contact['lead_id'] == lead['id']
+      end
+
+      # filter out the decision makers
+      decision_makers = lead_contacts.select do |contact|
+        next if contact[@fields.get(:decision_maker)].nil?
+
+        contact[@fields.get(:decision_maker)].include? 'Yes'
+      end
+
+      # remove decision makers excluded from sequence
+      available_decision_makers = decision_makers.reject do |contact|
+        # next if contact[@fields.get(:excluded_from_sequence)].blank?
+        contact[@fields.get(:excluded_from_sequence)] == 'Yes'
+      end
+
+      # create the lead payload
+      payload = {}
+      payload[@fields.get(:available_decision_makers)] = available_decision_makers.count
+
+      # update the lead
+      @close_api.update_lead(lead['id'], payload)
     end
   end
 
