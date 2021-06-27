@@ -41,20 +41,6 @@ class CloseApi
     found
   end
 
-  # fetches a singular contact
-  def find_contact(id)
-    find('contact', id)
-  end
-
-  # fetch a singular lead
-  def find_lead(id)
-    find('lead', id)
-  end
-
-  # fetches all contacts
-  def all_contacts
-    all('contact')
-  end
 
   # fetches all tasks
   def all_tasks
@@ -71,10 +57,6 @@ class CloseApi
     create('task', payload)
   end
 
-  # updates existing contact
-  def update_contact(id, payload)
-    update('contact', id, payload)
-  end
 
   # updates an existing task
   def update_task(id, payload)
@@ -85,6 +67,40 @@ class CloseApi
   # pass in the sequence id
   def all_sequence_subscriptions(id)
     all 'sequence_subscription', 'sequence_id': id
+  end
+
+  ######  **** Leads **** ######
+
+  # fetch a singular lead
+  def find_lead(id)
+    find('lead', id)
+  end
+
+  # fetches all leads
+  def all_leads
+    all('lead')
+  end
+
+  # updates existing lead
+  def update_lead(id, payload)
+    update('lead', id, payload)
+  end
+
+  ######  **** Contacts **** ######
+
+  # fetches a singular contact
+  def find_contact(id)
+    find('contact', id)
+  end
+
+  # fetches all contacts
+  def all_contacts
+    all('contact')
+  end
+
+  # updates existing contact
+  def update_contact(id, payload)
+    update('contact', id, payload)
   end
 
   ######  **** Opportunities **** ######
