@@ -21,6 +21,9 @@ gem 'webpacker', '~> 5.0'
 
 gem 'bootsnap', '>= 1.4.4', require: false
 
+# AI
+gem 'classifier-reborn'
+
 group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'clipboard'
