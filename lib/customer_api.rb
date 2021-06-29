@@ -39,18 +39,19 @@ class CustomerApi
         name: 'Four Email Opens',
         trumps: false,
         needs_nurturing: 'No',
-        add_task: true,
-        task_message: 'Four emails opened, consider starting a sequence for' },
-      { number: 10,
-        name: 'Link Clicked',
-        trumps: false,
-        needs_nurturing: 'No',
-        add_task: true,
-        task_message: 'Link clicked, consider starting a sequence for' }
+        add_task: false,
+        task_message: 'Four emails opened, consider starting a sequence for' }
     ]
+
+    @link_segment = { number: 10,
+                      name: 'Link Clicked',
+                      trumps: false,
+                      needs_nurturing: 'No',
+                      add_task: true,
+                      task_message: 'Link clicked, consider starting a sequence for' }
   end
 
-  attr_reader :segments
+  attr_reader :segments, :link_segment
 
   # returns an array of contacts from a segment
   # @param [Integer] segment_id an id of the segment

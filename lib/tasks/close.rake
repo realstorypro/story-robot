@@ -111,6 +111,25 @@ namespace :close do
     end
   end
 
+  desc 'tag customers that have clicked a link'
+  task :tag_link_clickers => :environment do
+    customer_contacts = @customer_api.get_segment(@customer_api.link_segment[:number])
+    close_contacts = @close_api.all_contacts
+
+    customer_contacts.each do |customer_contact|
+      customer_email = customer_contact['attributes']['email']
+
+      close_contact = @close_api.find_in_contacts(close_contacts, customer_email)
+      next unless close_contact
+
+      contact_payload = {}
+      contact_payload[@fields.get(:clicked_link)] = 'Yes'
+
+      response = @close_api.update_contact(close_contact['id'], contact_payload)
+      puts response
+    end
+  end
+
   desc 'forward incomplete tasks for leads without opportunities'
   task :forward_tasks, [:number] => :environment do
     tasks = @close_api.all_tasks
