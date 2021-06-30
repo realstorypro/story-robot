@@ -259,15 +259,21 @@ namespace :close do
         # 8. don't do anything if the opportunity is in the 'in-progress' stages
         next if opportunity['status_display_name'].in? ['Demo Completed', 'Proposal Sent']
 
-        # 9. update opportunity status to 'retry' pipeline
-        @close_api.update_opportunity opportunity['id'],
-                                      "status_id": 'stat_ndxTbqCzVFX1KQVdc0d7as93ZdkVKCbjaHGY2dFjCA0'
+        # 9. don't do anything if sequence was updated less then 5 days ago
+        date_updated = DateTime.parse(opportunity['date_updated'])
+        date_difference = date_updated.step(Date.today).count
 
-        # 10. set the contact to the do not sequence
+        next if date_difference < 5
+
+        # 10. update opportunity status to 'retry' stage
+        @close_api.update_opportunity opportunity['id'],
+                                      "status_id": 'stat_EZlDvFrb9F9jj93Okls3fBQAWGTS2LcrMoeKmE4kqRR'
+
+        # 11. set the contact to the do not sequence
         @close_api.update_contact contact['id'],
                                   "custom.cf_iuK23d7LKjVFuR9z52ddWRHEjCkkHZ23xCRzLvGIP83": 'Yes'
 
-        puts opportunity, '****'
+        puts opportunity, subscription, '****'
       end
       puts sequence['name'], subscriptions.count, '----'
     end
@@ -365,7 +371,6 @@ namespace :close do
       puts contact, "****"
     end
   end
-
 
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
