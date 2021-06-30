@@ -1,5 +1,4 @@
 require 'csv'
-require 'ruby-fann'
 require 'classifier-reborn'
 
 class Ai
@@ -10,7 +9,7 @@ class Ai
     @sequence_training = 'sequence_training.csv'
     @sequence_inputs = []
     @sequence_outputs = []
-    setup_sequence_ai
+    setup_sequence_dictionary
   end
 
   def train_decision_makers
@@ -26,7 +25,7 @@ class Ai
     end
   end
 
-  def setup_sequence_ai
+  def setup_sequence_dictionary
     training_data = File.read("./lib/training/#{@sequence_training}")
     parsed_data = CSV.parse(training_data, headers: true)
 
@@ -43,7 +42,6 @@ class Ai
       when 'o'
         @sequence_outputs.push 0
       end
-
     end
   end
 
@@ -65,8 +63,6 @@ class Ai
   def send_email?(weeks_old, segment, clicked_link, visited_website, visited_pricing)
     search_array = [weeks_old, segment, clicked_link, visited_website, visited_pricing]
     search_index = @sequence_inputs.find_index(search_array)
-
-    puts search_index
 
     return true if @sequence_outputs[search_index] == 1
 

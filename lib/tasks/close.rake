@@ -331,11 +331,39 @@ namespace :close do
 
   desc 'tag contacts ready for email'
   task :tag_ready_for_email do
-    puts ai_resp = @ai.send_email?(1, 0, 1, 1, 1)
-    puts ai_resp = @ai.send_email?(7, 0, 1, 1, 1)
-    puts ai_resp = @ai.send_email?(2, 0, 0, 1, 1)
-    puts ai_resp = @ai.send_email?(3, 0, 0, 1, 1)
-    puts ai_resp = @ai.send_email?(4, 0, 0, 1, 1)
+    contacts = @close_api.all_contacts
+    contacts.each do |contact|
+
+      nurture_start_date = contact[@fields.get(:nurture_start_date)]
+      customer_segment = contact[@fields.get(:customer_segment)]
+      clicked_link = contact[@fields.get(:clicked_link)]
+
+      next if nurture_start_date.nil?
+      next if customer_segment.nil?
+
+      weeks_old = Date.parse(nurture_start_date).step(Date.today, 7).count
+      # anything over 7 weeks old is still counted as 7 weeks
+      weeks_old = 7 if weeks_old > 7
+
+      segment_score = @customer_api.get_segment_score(customer_segment)
+      link_score = if clicked_link == 'Yes'
+                     1
+                   else
+                     0
+                   end
+
+      # last two items are set to zero since we don't have leadfeeder hooked up
+      send_email = @ai.send_email?(weeks_old, segment_score, link_score, 0, 0)
+
+      next unless send_email
+
+      # Tag the contact as ready for email
+      payload = {}
+      payload[@fields.get(:ready_for_email)] = 'Yes'
+      @close_api.update_contact(contact['id'], payload)
+
+      puts contact, "****"
+    end
   end
 
 
