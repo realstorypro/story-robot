@@ -8,36 +8,42 @@ class CustomerApi
       { number: 6,
         name: 'Unsubscribed',
         trumps: true,
+        score: 0,
         needs_nurturing: 'No',
         add_task: false,
         task_message: '' },
       { number: 7,
         name: 'Active Subscribers',
         trumps: false,
+        score: 0,
         needs_nurturing: 'No',
         add_task: false,
         task_message: '' },
       { number: 12,
         name: 'One Email Open',
         trumps: false,
+        score: 0,
         needs_nurturing: 'No',
         add_task: false,
         task_message: '' },
       { number: 8,
         name: 'Two Email Opens',
         trumps: false,
+        score: 2,
         needs_nurturing: 'No',
         add_task: false,
         task_message: 'Two emails opened, consider starting a sequence for' },
       { number: 13,
         name: 'Three Email Opens',
         trumps: false,
+        score: 3,
         needs_nurturing: 'No',
         add_task: false,
         task_message: 'Three emails opened, consider starting a sequence for' },
       { number: 14,
         name: 'Four Email Opens',
         trumps: false,
+        score: 4,
         needs_nurturing: 'No',
         add_task: false,
         task_message: 'Four emails opened, consider starting a sequence for' }
@@ -125,6 +131,12 @@ class CustomerApi
     else
       'inferior'
     end
+  end
+
+  # @param segment_name [String] a name stored in Close.IO segment
+  def get_segment_score(segment_name)
+    segment = @segments.find { |segment| segment[:name] == segment_name }
+    segment[:score]
   end
 
 

@@ -31,6 +31,13 @@ namespace :contacts do
       geocoding_resp =
         HTTParty.get("https://maps.googleapis.com/maps/api/geocode/json?key=#{ENV['GOOGLE_MAPS_KEY']}&censor=false&address=#{company_location}")
 
+      # skip enrichment if we get no results, but set enriched to yes and set no address field to true
+      if geocoding_resp['status'] == 'ZERO_RESULTS'
+        puts "No results for #{contact.company.name}"
+        contact.update(no_address: true, enriched: true)
+        next
+      end
+
       coordinates = geocoding_resp['results'][0]['geometry']['location']
       contact.update(lat: coordinates['lat'], lng: coordinates['lng'])
 
