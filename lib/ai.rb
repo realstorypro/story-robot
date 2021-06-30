@@ -5,6 +5,7 @@ class Ai
   def initialize
     @decision_makers = 'decision_makers.csv'
     @decision_classifier = ClassifierReborn::Bayes.new 'Decision Maker', 'Regular'
+    @sequence_training = 'sequence_training.csv'
   end
 
   def train_decision_makers
@@ -18,6 +19,10 @@ class Ai
         @decision_classifier.train('Regular', row['title'])
       end
     end
+  end
+
+  def train_sequence_training
+
   end
 
   # Determines if the job title belongs to a decison maker

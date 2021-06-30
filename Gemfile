@@ -23,6 +23,7 @@ gem 'bootsnap', '>= 1.4.4', require: false
 
 # AI
 gem 'classifier-reborn'
+gem 'ruby-fann'
 
 group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
