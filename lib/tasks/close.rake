@@ -3,6 +3,7 @@
 require 'close_api'
 require 'custom_fields'
 require 'customer_api'
+require 'opportunity_statuses'
 require 'ai'
 
 require 'json'
@@ -12,6 +13,7 @@ namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
   @fields = CustomFields.new
+  @statuses = OpportunityStatuses.new
   @ai = Ai.new
 
   desc 'syncs the segments from customer.io to close.com'
@@ -370,6 +372,11 @@ namespace :close do
 
       puts contact, "****"
     end
+  end
+
+  desc 'sorts contacts in the retry sequence stage'
+  task :sort_retries do
+    puts 'sorting retries'
   end
 
   def msg_slack(msg)
