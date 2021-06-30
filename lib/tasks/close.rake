@@ -329,6 +329,14 @@ namespace :close do
     end
   end
 
+  desc 'tag contacts ready for email'
+  task :tag_ready_for_email do
+    @ai.train_sequence_training
+    puts ai_resp = @ai.send_email?(1, 0, 1, 1, 1)
+    puts ai_resp = @ai.send_email?(7, 0, 1, 1, 1)
+  end
+
+
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
   end
