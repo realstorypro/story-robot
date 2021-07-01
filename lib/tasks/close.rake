@@ -13,7 +13,7 @@ namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
   @fields = CustomFields.new
-  @statuses = OpportunityStatuses.new
+  @status = OpportunityStatuses.new
   @ai = Ai.new
 
   desc 'syncs the segments from customer.io to close.com'
@@ -376,7 +376,27 @@ namespace :close do
 
   desc 'sorts contacts in the retry sequence stage'
   task :sort_retries do
-    puts 'sorting retries'
+    puts '*** Sorting Retries Opportunity Stage ***'
+
+    contacts = @close_api.all_contacts
+    @close_api.all_opportunities.each do |opportunity|
+      next unless opportunity['status_id'] == @status.get(:retry_sequence)
+
+      lead = @close_api.find_lead(opportunity['lead_id'])
+      ready_decision_makers = @close_api.ready_decision_makers(contacts, lead['id'])
+
+      payload = {}
+
+      if ready_decision_makers.count > 0
+        payload['status_id'] = @status.get(:ready_for_sequence)
+      else
+        puts 'there are no ready decision makers'
+        puts lead[@fields.get(:available_decision_makers)]
+      end
+
+      puts "updating: #{opportunity['id']}", payload
+      @close_api.update_opportunity(opportunity['id'], payload)
+    end
   end
 
   def msg_slack(msg)
