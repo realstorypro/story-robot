@@ -387,11 +387,17 @@ namespace :close do
 
       payload = {}
 
-      if ready_decision_makers.count > 0
-        payload['status_id'] = @status.get(:ready_for_sequence)
+      # check if the lead has available decision makers
+      if lead[@fields.get(:available_decision_makers)] > 0
+        # decide if we're ready to seq or the lead still needs nurturing
+        payload['status_id'] = if ready_decision_makers.count > 0
+                                 @status.get(:ready_for_sequence)
+                               else
+                                 @status.get(:nurturing_contacts)
+                               end
       else
-        puts 'there are no ready decision makers'
-        puts lead[@fields.get(:available_decision_makers)]
+        # move things over to need contacts since we don't have any decision makers
+        payload['status_id'] = @status.get(:needs_contacts)
       end
 
       puts "updating: #{opportunity['id']}", payload
