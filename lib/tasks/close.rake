@@ -405,6 +405,27 @@ namespace :close do
     end
   end
 
+  desc 'plucks nurtured leads'
+  task :pluck_nurtured do
+    puts '*** Plucking Nurtured Opportunities ***'
+
+    contacts = @close_api.all_contacts
+    @close_api.all_opportunities.each do |opportunity|
+      next unless opportunity['status_id'] == @status.get(:nurturing_contacts)
+
+      lead = @close_api.find_lead(opportunity['lead_id'])
+      ready_decision_makers = @close_api.ready_decision_makers(contacts, lead['id'])
+
+      next if ready_decision_makers.empty?
+
+      payload = {}
+      payload['status_id'] = @status.get(:ready_for_sequence)
+
+      puts "updating: #{opportunity['id']}", payload
+      @close_api.update_opportunity(opportunity['id'], payload)
+    end
+  end
+
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
   end
