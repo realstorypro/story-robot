@@ -3,6 +3,7 @@
 require 'close_api'
 require 'custom_fields'
 require 'customer_api'
+require 'opportunity_statuses'
 require 'ai'
 
 require 'json'
@@ -12,6 +13,7 @@ namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
   @fields = CustomFields.new
+  @status = OpportunityStatuses.new
   @ai = Ai.new
 
   desc 'syncs the segments from customer.io to close.com'
@@ -369,6 +371,37 @@ namespace :close do
       @close_api.update_contact(contact['id'], payload)
 
       puts contact, "****"
+    end
+  end
+
+  desc 'sorts contacts in the retry sequence stage'
+  task :sort_retries do
+    puts '*** Sorting Retries Opportunity Stage ***'
+
+    contacts = @close_api.all_contacts
+    @close_api.all_opportunities.each do |opportunity|
+      next unless opportunity['status_id'] == @status.get(:retry_sequence)
+
+      lead = @close_api.find_lead(opportunity['lead_id'])
+      ready_decision_makers = @close_api.ready_decision_makers(contacts, lead['id'])
+
+      payload = {}
+
+      # check if the lead has available decision makers
+      if lead[@fields.get(:available_decision_makers)] > 0
+        # decide if we're ready to seq or the lead still needs nurturing
+        payload['status_id'] = if ready_decision_makers.count > 0
+                                 @status.get(:ready_for_sequence)
+                               else
+                                 @status.get(:nurturing_contacts)
+                               end
+      else
+        # move things over to need contacts since we don't have any decision makers
+        payload['status_id'] = @status.get(:needs_contacts)
+      end
+
+      puts "updating: #{opportunity['id']}", payload
+      @close_api.update_opportunity(opportunity['id'], payload)
     end
   end
 

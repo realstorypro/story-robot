@@ -1,5 +1,8 @@
+require 'custom_fields'
+
 class CloseApi
   def initialize
+    @fields = CustomFields.new
     @close_api_base = "https://#{ENV['CLOSE_API_KEY']}:@api.close.com/api/v1/"
   end
 
@@ -84,6 +87,15 @@ class CloseApi
   # updates existing lead
   def update_lead(id, payload)
     update('lead', id, payload)
+  end
+
+  # fetches the ready decision makers for the lead
+  # @param contacts [Array] the contacts array
+  # @param lead_id [Integer] the id of the lead we are looking up
+  def ready_decision_makers(contacts, lead_id)
+    lead_contacts = contacts.select { |c| c['lead_id'] == lead_id }
+    lead_contacts = lead_contacts.select { |c| c[@fields.get(:decision_maker)] == 'Yes' }
+    lead_contacts.select { |c| c[@fields.get(:ready_for_email)] == 'Yes' }
   end
 
   ######  **** Contacts **** ######
