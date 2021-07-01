@@ -95,6 +95,7 @@ class CloseApi
   def ready_decision_makers(contacts, lead_id)
     lead_contacts = contacts.select { |c| c['lead_id'] == lead_id }
     lead_contacts = lead_contacts.select { |c| c[@fields.get(:decision_maker)] == 'Yes' }
+    lead_contacts = lead_contacts.reject { |c| c[@fields.get(:excluded_from_sequence)] == 'Yes' }
     lead_contacts.select { |c| c[@fields.get(:ready_for_email)] == 'Yes' }
   end
 
