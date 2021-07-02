@@ -50,11 +50,6 @@ class CloseApi
     all('task')
   end
 
-  # fetches all sequences
-  def all_sequence
-    all('sequence')
-  end
-
   # creates a new task
   def create_task(payload)
     create('task', payload)
@@ -64,6 +59,16 @@ class CloseApi
   # updates an existing task
   def update_task(id, payload)
     update('task', id, payload)
+  end
+
+  ######  **** Sequences **** ######
+  # fetches all sequences
+  def all_sequence
+    all('sequence')
+  end
+
+  def create_sequence_subscription(payload)
+    create('sequence_subscription', payload)
   end
 
   # finds all sequence subscriptions
@@ -89,7 +94,7 @@ class CloseApi
     update('lead', id, payload)
   end
 
-  # fetches the ready decision makers for the lead
+  # Fetches the ready decision makers for the lead
   # @param contacts [Array] the contacts array
   # @param lead_id [Integer] the id of the lead we are looking up
   def ready_decision_makers(contacts, lead_id)

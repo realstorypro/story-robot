@@ -426,6 +426,71 @@ namespace :close do
     end
   end
 
+  desc 'sets a point of contact for the opportunity'
+  task :set_contact do
+    puts '*** Setting Point of Contact for Opportunities ***'
+
+    contacts = @close_api.all_contacts
+    @close_api.all_opportunities.each do |opportunity|
+      next unless opportunity['status_id'] == @status.get(:ready_for_sequence)
+
+      lead = @close_api.find_lead(opportunity['lead_id'])
+      ready_decision_makers = @close_api.ready_decision_makers(contacts, lead['id'])
+
+      picked_decision_maker = ready_decision_makers.sample(1).last
+
+      if picked_decision_maker.nil?
+        msg_slack "No decision maker for #{opportunity['lead_name']}"
+        next
+      end
+
+      payload = {}
+      payload['contact_id'] = picked_decision_maker['id']
+
+      puts "updating: #{opportunity['id']}", payload
+      @close_api.update_opportunity(opportunity['id'], payload)
+    end
+  end
+
+  desc 'subscribe to sequence for events in the ready stage'
+  task :subscribe_to_sequence do
+    # Settings for Personal Sequence
+    # sequence_id - seq_7lmdVlbHR2y9rRcGkIbBz0
+    # sender_account_id - emailacct_UUIuo4k4ilPpJnmdC6kbcW6AG9mWcscPKaJQCuIr0T6
+    # sender_name - Michael Few
+    # sender_email - michael@storypro.io
+
+    sequence_payload = {
+      sequence_id: 'seq_7lmdVlbHR2y9rRcGkIbBz0',
+      sender_account_id: 'emailacct_UUIuo4k4ilPpJnmdC6kbcW6AG9mWcscPKaJQCuIr0T6',
+      sender_name: 'Michael Few',
+      sender_email: 'michael@storypro.io'
+    }
+
+    sequence_payload['contact_id'] = 'cont_CcGnPF1ua7rIyRTYCjkt0pgeshW6TjS6gWcRZSzgVih'
+    sequence_payload['contact_email'] = 'leonid@storypro.io'
+
+    @close_api.all_opportunities.each do |opportunity|
+      next unless opportunity['status_id'] == @status.get(:ready_for_sequence)
+
+      contact = @close_api.find_contact(opportunity['contact_id'])
+      contact_email = contact['emails'].reject { |c| c['email'].nil? }.last['email']
+
+      sequence_payload['contact_id'] = contact['id']
+      sequence_payload['contact_email'] = contact_email
+
+      @close_api.create_sequence_subscription(sequence_payload)
+      puts "emailing: #{opportunity['id']}", sequence_payload
+
+      opportunity_payload = {}
+      opportunity_payload['status_id'] = @status.get(:in_sales_sequence)
+
+      puts "updating: #{opportunity['id']}", opportunity_payload
+      @close_api.update_opportunity(opportunity['id'], opportunity_payload)
+    end
+  end
+
+
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
   end
