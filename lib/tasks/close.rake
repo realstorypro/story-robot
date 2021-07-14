@@ -4,6 +4,9 @@ require 'close_api'
 require 'custom_fields'
 require 'customer_api'
 require 'opportunity_statuses'
+require 'lead_statuses'
+
+require 'scraper'
 require 'ai'
 
 require 'json'
@@ -13,7 +16,8 @@ namespace :close do
   @close_api = CloseApi.new
   @customer_api = CustomerApi.new
   @fields = CustomFields.new
-  @status = OpportunityStatuses.new
+  @opp_status = OpportunityStatuses.new
+  @lead_status = LeadStatuses.new
   @ai = Ai.new
 
   desc 'syncs the segments from customer.io to close.com'
@@ -255,23 +259,26 @@ namespace :close do
         # are only looking at the last opportunity
         opportunity = opportunities.last
 
-        # 7. we only want to perform the action on active opportunities
+        # 7. Move on if the opportunity does not exist
+        next if opportunity.nil?
+
+        # 8. we only want to perform the action on active opportunities
         next unless opportunity['status_type'] == 'active'
 
-        # 8. don't do anything if the opportunity is in the 'in-progress' stages
-        next if opportunity['status_display_name'].in? ['Demo Completed', 'Proposal Sent']
+        # 9. don't do anything if the opportunity is in the 'in-progress' stages
+        next if opportunity['status_display_name'].in? ['Demo Completed', 'Proposal Sent', 'Waiting']
 
-        # 9. don't do anything if sequence was updated less then 5 days ago
+        # 10. don't do anything if sequence was updated less then 5 days ago
         date_updated = DateTime.parse(opportunity['date_updated'])
         date_difference = date_updated.step(Date.today).count
 
         next if date_difference < 5
 
-        # 10. update opportunity status to 'retry' stage
+        # 11. update opportunity status to 'retry' stage
         @close_api.update_opportunity opportunity['id'],
                                       "status_id": 'stat_EZlDvFrb9F9jj93Okls3fBQAWGTS2LcrMoeKmE4kqRR'
 
-        # 11. set the contact to the do not sequence
+        # 12. set the contact to the do not sequence
         @close_api.update_contact contact['id'],
                                   "custom.cf_iuK23d7LKjVFuR9z52ddWRHEjCkkHZ23xCRzLvGIP83": 'Yes'
 
@@ -380,7 +387,7 @@ namespace :close do
 
     contacts = @close_api.all_contacts
     @close_api.all_opportunities.each do |opportunity|
-      next unless opportunity['status_id'] == @status.get(:retry_sequence)
+      next unless opportunity['status_id'] == @opp_status.get(:retry_sequence)
 
       lead = @close_api.find_lead(opportunity['lead_id'])
       ready_decision_makers = @close_api.ready_decision_makers(contacts, lead['id'])
@@ -391,13 +398,13 @@ namespace :close do
       if lead[@fields.get(:available_decision_makers)] > 0
         # decide if we're ready to seq or the lead still needs nurturing
         payload['status_id'] = if ready_decision_makers.count > 0
-                                 @status.get(:ready_for_sequence)
+                                 @opp_status.get(:ready_for_sequence)
                                else
-                                 @status.get(:nurturing_contacts)
+                                 @opp_status.get(:nurturing_contacts)
                                end
       else
         # move things over to need contacts since we don't have any decision makers
-        payload['status_id'] = @status.get(:needs_contacts)
+        payload['status_id'] = @opp_status.get(:needs_contacts)
       end
 
       puts "updating: #{opportunity['id']}", payload
@@ -405,13 +412,13 @@ namespace :close do
     end
   end
 
-  desc 'plucks nurtured leads'
+  desc 'plucks nurtured opportunities'
   task :pluck_nurtured do
     puts '*** Plucking Nurtured Opportunities ***'
 
     contacts = @close_api.all_contacts
     @close_api.all_opportunities.each do |opportunity|
-      next unless opportunity['status_id'] == @status.get(:nurturing_contacts)
+      next unless opportunity['status_id'] == @opp_status.get(:nurturing_contacts)
 
       lead = @close_api.find_lead(opportunity['lead_id'])
       ready_decision_makers = @close_api.ready_decision_makers(contacts, lead['id'])
@@ -419,7 +426,7 @@ namespace :close do
       next if ready_decision_makers.empty?
 
       payload = {}
-      payload['status_id'] = @status.get(:ready_for_sequence)
+      payload['status_id'] = @opp_status.get(:ready_for_sequence)
 
       puts "updating: #{opportunity['id']}", payload
       @close_api.update_opportunity(opportunity['id'], payload)
@@ -432,7 +439,7 @@ namespace :close do
 
     contacts = @close_api.all_contacts
     @close_api.all_opportunities.each do |opportunity|
-      next unless opportunity['status_id'] == @status.get(:ready_for_sequence)
+      next unless opportunity['status_id'] == @opp_status.get(:ready_for_sequence)
 
       lead = @close_api.find_lead(opportunity['lead_id'])
       ready_decision_makers = @close_api.ready_decision_makers(contacts, lead['id'])
@@ -471,7 +478,7 @@ namespace :close do
     sequence_payload['contact_email'] = 'leonid@storypro.io'
 
     @close_api.all_opportunities.each do |opportunity|
-      next unless opportunity['status_id'] == @status.get(:ready_for_sequence)
+      next unless opportunity['status_id'] == @opp_status.get(:ready_for_sequence)
 
       contact = @close_api.find_contact(opportunity['contact_id'])
       contact_email = contact['emails'].reject { |c| c['email'].nil? }.last['email']
@@ -483,10 +490,40 @@ namespace :close do
       puts "emailing: #{opportunity['id']}", sequence_payload
 
       opportunity_payload = {}
-      opportunity_payload['status_id'] = @status.get(:in_sales_sequence)
+      opportunity_payload['status_id'] = @opp_status.get(:in_sales_sequence)
 
       puts "updating: #{opportunity['id']}", opportunity_payload
       @close_api.update_opportunity(opportunity['id'], opportunity_payload)
+    end
+  end
+
+  desc 'find wordpress sites'
+  task :scrape_leads do
+    puts '*** Scraping Potentail Leads ***'
+
+    scraper = Scraper.new
+    leads = @close_api.all_leads
+
+    leads.each do |lead|
+      next unless lead['status_id'] == @lead_status.get(:potential)
+      next if lead['url'].blank?
+
+      scraper.start
+
+      next unless scraper.load_page lead['url']
+
+      tech = scraper.determine_tech
+
+      next if tech == false
+
+      payload = {}
+      payload['status_id'] = @lead_status.get(:machine_qualified)
+      payload[@fields.get(:technology)] = tech
+
+      puts "updating: #{lead['id']}", payload
+
+      @close_api.update_lead(lead['id'], payload)
+      scraper.quit
     end
   end
 
