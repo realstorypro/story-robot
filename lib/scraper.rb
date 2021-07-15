@@ -3,9 +3,7 @@
 require 'selenium-webdriver'
 
 class Scraper
-  def initialize; end
-
-  def start
+  def initialize
     options = Selenium::WebDriver::Chrome::Options.new
     options.add_argument('--headless')
     @driver = Selenium::WebDriver::Driver.for :chrome, options: options
@@ -34,18 +32,16 @@ class Scraper
   end
 
   def determine_tech
-    return 'Rails' if (source.include?('csrf-param') && source.include?('csrf-token'))
-    return 'Contentful' if source.include?('ctfassets.net')
-    return 'WordPress' if source.include?('wp-')
-    return 'Drupal' if (source.include?('drupal') || source.include?('Drupal'))
+    return 'Rails' if (page_source.include?('csrf-param') && page_source.include?('csrf-token'))
+    return 'Contentful' if page_source.include?('ctfassets.net')
+    return 'WordPress' if page_source.include?('wp-')
+    return 'Drupal' if (page_source.include?('drupal') || page_source.include?('Drupal'))
 
     false
   end
 
-  private
-
   # gets the source of the page
-  def source
+  def page_source
     @driver.page_source
   end
 
