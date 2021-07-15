@@ -508,22 +508,25 @@ namespace :close do
       next unless lead['status_id'] == @lead_status.get(:potential)
       next if lead['url'].blank?
 
-      scraper.start
-
+      puts "scraping ... #{lead['url']}"
       next unless scraper.load_page lead['url']
 
       tech = scraper.determine_tech
 
-      next if tech == false
-
       payload = {}
-      payload['status_id'] = @lead_status.get(:machine_qualified)
-      payload[@fields.get(:technology)] = tech
+      if tech == false
+        payload['status_id'] = @lead_status.get(:unknown_tech)
 
-      puts "updating: #{lead['id']}", payload
+        puts "unknown tech - updating: #{lead['id']}", payload
 
+      else
+        payload['status_id'] = @lead_status.get(:machine_qualified)
+        payload[@fields.get(:technology)] = tech
+
+        puts "updating: #{lead['id']}", payload
+
+      end
       @close_api.update_lead(lead['id'], payload)
-      scraper.quit
     end
   end
 
