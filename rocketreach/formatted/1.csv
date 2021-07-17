@@ -1,0 +1,93 @@
+first_name,last_name,company,title,email,needs_nurturing,decision_maker
+Kevin,Koper,SnappCar,Head Of Technology,kevin@snappcar.nl,Yes,Yes
+Victor,van Tol,SnappCar,Founder and Board-Member Snappcar,victor@snappcar.nl,Yes,Yes
+Babs,Renee,SnappCar,CFO,babs@snappcar.nl,Yes,Yes
+Robin,Sikkens,SnappCar,Head of Product,robin@snappcar.nl,Yes,Yes
+Christoph,van der Klaauw,SnappCar,Chief Operating Officer,christoph.vanderklaauw@snappcar.nl,Yes,Yes
+Steve,Rice,IPVideo Corporation,Director of Business Development,steve.rice@ipvideocorp.com,Yes,Yes
+David,Antar,IPVideo Corporation,President,david@ipvideocorp.com,Yes,Yes
+Frank,Jacovino,Advance Convergence Group,Vice President Operations Research and Development,fjacovino@aplustechnology.com,Yes,Yes
+Paul,Galburt,G2 Ideas,President,paul@g2ideas.com,Yes,Yes
+Kristina,Fong,California Academy of Sciences,Social Media and Digital Engagement Specialist,kristina.fong@calacademy.org,Yes,Yes
+Laurel,Allen,California Academy of Sciences,Digital Engagement and Community Manager at California Academy of Sciences,lallen@calacademy.org,Yes,Yes
+Scott,Sampson,California Academy of Sciences,Executive Director,ssampson@umnh.utah.edu,Yes,Yes
+Tiffany,Zarem,California Academy of Sciences,Director of Marketing,tiffany.zarem@calacademy.org,Yes,Yes
+Melissa,Felder,California Academy of Sciences,Chief Revenue and Marketing Officer at the California Academy of Sciences,mfelder@calacademy.org,Yes,Yes
+Chris,Brown,10Duke,Business Development Manager,chris.brown@10duke.com,Yes,Yes
+Eliel,Herlevi,10Duke,Digital Marketing Executive,eliel.herlevi@10duke.com,Yes,Yes
+Jarkko,Selkäinaho,10Duke,Chief Architect,jarkko.selkainaho@10duke.com,Yes,Yes
+Neil,Fenton,10Duke,Chairman,neil.fenton@10duke.com,Yes,Yes
+Dean,Zhao,Las Vegas Sands Corp.,"Vice President, Digital Marketing and Ecommerce at Las Vegas Sands Corp",dean.zhao@Sands.com,Yes,Yes
+Eric,Taitano,Las Vegas Sands Corp.,Digital Media Manager | Motion Designer,etaitano@symon.com,Yes,Yes
+Mark,Molinari,Las Vegas Sands Corp.,Vice President of Strategic Initiatives and Marketing Programs,mark.molinari@lasvegassands.com,Yes,Yes
+Steve,Henderson,Las Vegas Sands Corp.,Director Technology Contracts and Services,steve.henderson@sands.com,Yes,Yes
+Matt,Perkins,Las Vegas Sands Corp.,Vice President of Global Innovation,matt.perkins@sands.com,Yes,Yes
+Grant,Matthews,Las Vegas Sands Corp.,"VP, Corporate IT",grant.matthews@sands.com,Yes,Yes
+Souma,Sengupta,"Heartflow, Inc","Senior Director, Strategic Marketing and Global Services",ssengupta@heartflow.com,Yes,Yes
+John,Stevens,"HeartFlow, Inc","Chairman, Chief Executive Officer and Founder",john@heartflow.com,Yes,Yes
+Jennie,Kim,"Heartflow, Inc","Senior Director, Strategic Communications",jkim@heartflow.com,Yes,Yes
+Maunark,Patel,"Heartflow, Inc",Director Of Operations,mpatel@heartflow.com,Yes,Yes
+Isabelle,Steudler,Molotov TV,Head of Content,isteudler@molotov.tv,Yes,Yes
+Timothée,Gindre,Molotov TV,Head of Engagement & Monetization,tgindre@molotov.tv,Yes,Yes
+Grégory,Samak,Molotov TV,Senior Vice President,gsamak@molotov.tv,Yes,Yes
+Olivier,Kouvarakis,Molotov Tv,CMO,okouvarakis@molotov.tv,Yes,Yes
+Alexandre,Ouicher,Molotov TV,Chief Technical Officer,alexandre.ouicher@pmu.fr,Yes,Yes
+Valérie,Ackaouy,Molotov TV,Chief Communication Officer,vackaouy@molotov.tv,Yes,Yes
+JeanDavid,Blanc,Molotov TV,Founder & CEO,jeandavid@molotov.tv,Yes,Yes
+Ria,Cruz,Perkville,Manager of Customer Success Team,ria@perkville.com,Yes,Yes
+De,Sanders,Perkville,Marketing Associate,deanna@perkville.com,Yes,Yes
+Julia,Franklin,BioLite,"Vice President, Global Operations",julia@bioliteenergy.com,Yes,Yes
+Emily,Gates,BioLite,"Associate Director, E-Commerce",emily@bioliteenergy.com,Yes,Yes
+Alec,Drummond,BioLite,Chief Technology Officer,alec@bioliteenergy.com,Yes,Yes
+Robb,Dahir,BioLite,Chief Financial Officer,robb@bioliteenergy.com,Yes,Yes
+Ryan,Gist,Biolite,Vice President Of Product Management,ryan@BioLiteEnergy.com,Yes,Yes
+Erica,Rosen,BioLite,VP of Marketing,erica@bioliteenergy.com,Yes,Yes
+Marc,Lotenberg,Surface Magazine,CEO,mlotenberg@surfacemag.com,Yes,Yes
+Bill,Smyth,Surface Magazine,Director of Content Operations,bsmyth@surfacemag.com,Yes,Yes
+Janet,Choi,Clearbit,Head of Content,janet@clearbit.com,Yes,Yes
+Jonathan,Delich,Clearbit,Head Of Business Operations,jonathan@clearbit.com,Yes,Yes
+Greg,Walder,Clearbit,Vice President Sales,greg.walder@clearbit.com,Yes,Yes
+Nicholas,W.,Clearbit,VP Marketing,nwentz@clearbit.com,Yes,Yes
+Harlow,Ward,Clearbit,CTO,ward@clearbit.com,Yes,Yes
+Luke,Diaz,Clearbit,"Vice President, Customer Success",luke@clearbit.com,Yes,Yes
+Matt,Sornson,Clearbit,Interim Chief Executive Officer,matts@clearbit.com,Yes,Yes
+Jamie,Alvrus,"Vuori, Inc.",Senior Director of E-Commerce,jfontana@vuoriclothing.com,Yes,Yes
+Collin,Willardson,"Vuori, Inc.",Director of Media,cwillardson@vuoriclothing.com,Yes,Yes
+Nikki,Sakelliou,"Vuori, Inc.",VP of Marketing,nsakelliou@vuoriclothing.com,Yes,Yes
+Joe,Kudla,Vuori,Founder & CEO,joe@vuoriclothing.com,Yes,Yes
+Ariel,Winton,On Deck,On Deck Angels Fellow,ariel@ov.vc,Yes,Yes
+Ulrike,Kellmereit,True Ventures,Chief Financial Officer,ukellmereit@trueventures.com,Yes,Yes
+Christiaan,Vorkink,True Ventures,Vice President,cv@trueventures.com,Yes,Yes
+James,Stewart,True Ventures,Chief Operations Officer,jim@trueventures.com,Yes,Yes
+Gary,Jones,Travel Nurse Across America,Director,gjones@strategicmaadvisors.com,Yes,Yes
+Tim,McKenzie,Travel Nurse Across America,President / CEO,tmckenzie@tnaa.com,Yes,Yes
+Scott,Knox,Travel Nurse Across America,Vice President of Marketing,sknox@tnaa.com,Yes,Yes
+Noressa,Hinkler,Travel Nurse Across America,Director of Marketing and Communications,nkennedy@nurse.tv,Yes,Yes
+Jean,Cook,Travel Nurse Across America,COO,jcook@tnaa.com,Yes,Yes
+Curtis,Taylor,First Choice Health,"VP, Chief Sales Marketing  Officer",ctaylor@fchn.com,Yes,Yes
+Jaja,Okigwe,First Choice Health,President & CEO,jokigwe@fchn.com,Yes,Yes
+Dan,Brown,First Choice Health,Chief Technology Officer,dbrown@fchn.com,Yes,Yes
+Jonathan,Ritter,IAC,"Vice President, Information Technology and Sourcing",jonathan.ritter@iac.com,Yes,Yes
+Mark,Stein,IAC,Executive Vice President & Chief Strategy Officer,mark.stein@iac.com,Yes,Yes
+Thomas,Dehli,"CynergisTek, Inc.",Director Business Intelligence,thomas.dehli@cynergistek.com,Yes,Yes
+Sophia,Palmira,"CynergisTek, Inc.",Digital Marketing Manager,sophia.palmira@cynergistek.com,Yes,Yes
+Kathryn,Drake,"MeetSOCI, Inc.",Marketing Campaign Manager,kdrake@meetsoci.com,Yes,Yes
+Ed,Cooper,Skybox Security,Vice President Marketing,ecoop@cs.com,Yes,Yes
+Milena,Volkova,Skybox Security,Senior Marketing Operations,milena.volkova@skyboxsecurity.com,Yes,Yes
+Judy,Laine,Skybox Security,Director of Demand Generation,jlaine@ix.netcom.com,Yes,Yes
+Claire,Darling,Skybox Security,Chief Marketing Officer,claire.darling@skyboxsecurity.com,Yes,Yes
+Kathy,O'Connell,Skybox Security,"Senior Director, Corporate Marketing and Communications",kathy.oconnell@skyboxsecurity.com,Yes,Yes
+Gidi,Cohen,Skybox Security,Chief Executive Officer & Founder,gidi@skyboxsecurity.com,Yes,Yes
+David,Bender,Circular Polymers,Chief Executive Officer,dbender@circularpolymers.com,Yes,Yes
+Daniel,Musachia,HAVI,Chief Financial Officer,dmusachia@havigs.com,Yes,Yes
+Jennifer,Newton,Havi,Chief Communications Officer,jennifer.newton@havi.com,Yes,Yes
+Marc,Flood,Havi,Chief Information Officer and Head of Incubator,mflood@havigroup.com,Yes,Yes
+Victoria,Lee,HAVI,"Senior Director, Marketing Analytics and Consulting",vlee@havigs.com,Yes,Yes
+Gwendy,Krijger,Havi,Director of Marketing,gwendy.krijger@havi.com,Yes,Yes
+Kuriakos,Mellos,Bevi,Director of Growth - North America,kuriakos@bevi.co,Yes,Yes
+Diana,Cino,Refresh Water,VP of Marketing,diana@bevi.co,Yes,Yes
+Ezra,Gordon,Bevi,"Vice President, Operations",ezra@bevi.co,Yes,Yes
+Ben,Holstein,Refresh Water,COO,ben.holstein@bevi.co,Yes,Yes
+Barak,Shohat,Uptime.com,Chief Technology Officer and Co-Founder,barak@uptime.com,Yes,Yes
+Mike,Welsh,Uptime.com,Chief Executive Officer,mike@uptime.com,Yes,Yes
+Yoni,Solomon,Uptime.com,Chief Marketing Officer,yoni@uptime.com,Yes,Yes

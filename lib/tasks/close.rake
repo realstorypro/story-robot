@@ -530,7 +530,6 @@ namespace :close do
     end
   end
 
-
   def msg_slack(msg)
     HTTParty.post(WEBHOOK_URL.to_s, body: { text: msg }.to_json)
   end
