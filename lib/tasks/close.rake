@@ -265,6 +265,7 @@ namespace :close do
         # 8. we only want to perform the action on active opportunities
         next unless opportunity['status_type'] == 'active'
 
+        # TODO: Redo this use the status ids instead
         # 9. don't do anything if the opportunity is in the 'in-progress' stages
         next if opportunity['status_display_name'].in? ['Demo Completed', 'Proposal Sent', 'Waiting']
 
@@ -331,7 +332,6 @@ namespace :close do
 
       # remove decision makers excluded from sequence
       available_decision_makers = decision_makers.reject do |contact|
-        # next if contact[@fields.get(:excluded_from_sequence)].blank?
         contact[@fields.get(:excluded_from_sequence)] == 'Yes'
       end
 
@@ -348,7 +348,6 @@ namespace :close do
   task :tag_ready_for_email do
     contacts = @close_api.all_contacts
     contacts.each do |contact|
-
       nurture_start_date = contact[@fields.get(:nurture_start_date)]
       customer_segment = contact[@fields.get(:customer_segment)]
       clicked_link = contact[@fields.get(:clicked_link)]
