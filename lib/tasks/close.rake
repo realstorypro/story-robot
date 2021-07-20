@@ -348,7 +348,6 @@ namespace :close do
   task :tag_ready_for_email do
     contacts = @close_api.all_contacts
     contacts.each do |contact|
-
       nurture_start_date = contact[@fields.get(:nurture_start_date)]
       customer_segment = contact[@fields.get(:customer_segment)]
       clicked_link = contact[@fields.get(:clicked_link)]
