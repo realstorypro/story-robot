@@ -203,7 +203,7 @@ namespace :close do
   desc 'export close.com audience for linkedin'
   task :export, [:number] => :environment do |_t, _args|
     msg_slack 'preparing to export close.com for linkedin'
-    close_contacts = @close_api.search('export.json')
+    close_contacts = @close_api.search('contacts-in-opportunities.json')
 
     export_folder = "#{Dir.pwd}/linkedin_exports/"
     timestamp = Time.now.to_i
