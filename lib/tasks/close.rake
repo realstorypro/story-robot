@@ -496,6 +496,12 @@ namespace :close do
     end
   end
 
+  desc 'creates leads from strong opportunities'
+  task :ops_from_strong_leads do
+
+    puts '*** Creating Opportunities from Strong Leads ***'
+  end
+
   desc 'reset "do not email me contacts" to normal state'
   task :reset_contacts do
     contacts = @close_api.all_contacts
