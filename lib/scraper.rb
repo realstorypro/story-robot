@@ -18,6 +18,7 @@ class Scraper
 
   # loads a page based on a url
   def load_page(url)
+    url = url.gsub('http://', 'https://')
     @driver.get(url)
 
     # waits to ensure everything loads
