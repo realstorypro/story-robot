@@ -292,25 +292,25 @@ namespace :close do
   desc 'tag decision makers'
   task :tag_decision_makers => :environment do
 
-    @ai.train_decision_makers
-    contacts = @close_api.all_contacts
-    contacts.each do |contact|
-      next if contact['title'].blank?
+     @ai.train_decision_makers
+     contacts = @close_api.all_contacts
+     contacts.each do |contact|
+       next if contact['title'].blank?
 
-      next unless contact[@fields.get(:decision_maker)].blank?
+       next unless contact[@fields.get(:decision_maker)].blank?
 
-      contact_payload = {}
-      contact_payload[@fields.get(:decision_maker)] = if @ai.decision_maker? contact['title']
-                                                        'Yes'
-                                                      else
-                                                        'No'
-                                                      end
+       contact_payload = {}
+       contact_payload[@fields.get(:decision_maker)] = if @ai.decision_maker? contact['title']
+                                                         'Yes'
+                                                       else
+                                                         'No'
+                                                       end
 
-      @close_api.update_contact(contact['id'], contact_payload)
+       @close_api.update_contact(contact['id'], contact_payload)
 
-      puts "#{contact['title']} - #{@ai.decision_maker?(contact['title'])}", '***'
-    end
-  end
+       puts "#{contact['title']} - #{@ai.decision_maker?(contact['title'])}", '***'
+     end
+   end
 
   desc 'calculate available decision makers per lead'
   task :calc_decision_makers => :environment do
@@ -394,17 +394,17 @@ namespace :close do
       payload = {}
 
       # check if the lead has available decision makers
-      if lead[@fields.get(:available_decision_makers)] > 0
-        # decide if we're ready to seq or the lead still needs nurturing
-        payload['status_id'] = if ready_decision_makers.count > 0
+      payload['status_id'] = if (lead[@fields.get(:available_decision_makers)]).positive?
+                               # decide if we're ready to seq or the lead still needs nurturing
+                               if ready_decision_makers.count.positive?
                                  @opp_status.get(:ready_for_sequence)
                                else
                                  @opp_status.get(:nurturing_contacts)
-                               end
-      else
-        # move things over to need contacts since we don't have any decision makers
-        payload['status_id'] = @opp_status.get(:needs_contacts)
-      end
+                              end
+                             else
+                               # move things over to need contacts since we don't have any decision makers
+                               @opp_status.get(:needs_contacts)
+                             end
 
       puts "updating: #{opportunity['id']}", payload
       @close_api.update_opportunity(opportunity['id'], payload)
@@ -473,8 +473,8 @@ namespace :close do
       sender_email: 'michael@storypro.io'
     }
 
-    sequence_payload['contact_id'] = 'cont_CcGnPF1ua7rIyRTYCjkt0pgeshW6TjS6gWcRZSzgVih'
-    sequence_payload['contact_email'] = 'leonid@storypro.io'
+    # sequence_payload['contact_id'] = 'cont_CcGnPF1ua7rIyRTYCjkt0pgeshW6TjS6gWcRZSzgVih'
+    # sequence_payload['contact_email'] = 'leonid@storypro.io'
 
     @close_api.all_opportunities.each do |opportunity|
       next unless opportunity['status_id'] == @opp_status.get(:ready_for_sequence)
@@ -493,6 +493,18 @@ namespace :close do
 
       puts "updating: #{opportunity['id']}", opportunity_payload
       @close_api.update_opportunity(opportunity['id'], opportunity_payload)
+    end
+  end
+
+  desc 'reset "do not email me contacts" to normal state'
+  task :reset_contacts do
+    contacts = @close_api.all_contacts
+    contacts.each do |contact|
+      next unless contact[@fields.get(:excluded_from_sequence)] == 'Yes'
+
+      @close_api.update_contact contact['id'],
+                                "custom.cf_iuK23d7LKjVFuR9z52ddWRHEjCkkHZ23xCRzLvGIP83": 'No'
+      puts 'contact: ', contact, '---'
     end
   end
 
