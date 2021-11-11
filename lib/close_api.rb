@@ -128,6 +128,12 @@ class CloseApi
     all('opportunity')
   end
 
+  # create new opportunity
+  # @param payload [Hash] the opporutnity payload
+  def create_opportunity(payload)
+    create('opportunity', payload)
+  end
+
   # update an existing opportunity
   # @param opportunity_id [Integer] the id of the opportunity
   # @param payload [Hash] the payload containing updated fields

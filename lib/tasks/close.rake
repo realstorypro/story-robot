@@ -500,6 +500,29 @@ namespace :close do
   task :ops_from_strong_leads do
 
     puts '*** Creating Opportunities from Strong Leads ***'
+
+    close_contacts = @close_api.search('contacts-strong_leads-no_opportunities-not_badfit.json')
+    close_contacts.each do |contact|
+      lead = @close_api.find_lead(contact['lead_id'])
+      opportunities = @close_api.all_lead_opportunities(contact['lead_id'])
+
+      # there multiple contacts per lead
+      # and we do not want to create duplicates
+      next unless opportunities.count.zero?
+
+      payload = {
+        value: 27000,
+        value_period: 'annual',
+        confidence: 50,
+        lead_id: contact['lead_id'],
+        status_id: @opp_status.get(:new)
+      }
+
+      rsp = @close_api.create_opportunity(payload)
+      puts rsp
+
+      puts 'lead: ', lead, '---'
+    end
   end
 
   desc 'reset "do not email me contacts" to normal state'
