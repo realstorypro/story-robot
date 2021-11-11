@@ -1,0 +1,66 @@
+{
+    "query": {
+        "negate": false,
+        "queries": [
+            {
+                "negate": false,
+                "object_type": "contact",
+                "type": "object_type"
+            },
+            {
+                "negate": false,
+                "queries": [
+                    {
+                        "negate": false,
+                        "related_object_type": "lead",
+                        "related_query": {
+                            "negate": false,
+                            "queries": [
+                                {
+                                    "negate": false,
+                                    "related_object_type": "opportunity",
+                                    "related_query": {
+                                        "negate": false,
+                                        "queries": [
+                                            {
+                                                "condition": {
+                                                    "object_ids": [
+                                                        "stat_1NqYVXzCWNZr1SiRBQnis6vCen9fSdXbV1B6LlMr0oi",
+                                                        "stat_3P2yp1RCvFISf8lf8LJkFjpqpZMseDDE7vvc2OcQdoT",
+                                                        "stat_5SHe17gOvhXavzSedBXLOdzU9h5WudRDMV5ny3ExDw8",
+                                                        "stat_CpPzCiBrvDGYFnXVGHPs9tLmJjjOty7qLJzFCMk80jp",
+                                                        "stat_MIYuQiAxqx4ABKPRwZ2tC1hDS1F8fYQALajDXEePEp4"
+                                                    ],
+                                                    "reference_type": "status.opportunity",
+                                                    "type": "reference"
+                                                },
+                                                "field": {
+                                                    "field_name": "status_id",
+                                                    "object_type": "opportunity",
+                                                    "type": "regular_field"
+                                                },
+                                                "negate": false,
+                                                "type": "field_condition"
+                                            }
+                                        ],
+                                        "type": "and"
+                                    },
+                                    "this_object_type": "lead",
+                                    "type": "has_related"
+                                }
+                            ],
+                            "type": "and"
+                        },
+                        "this_object_type": "contact",
+                        "type": "has_related"
+                    }
+                ],
+                "type": "and"
+            }
+        ],
+        "type": "and"
+    },
+    "include_counts": true,
+    "_limit": 100,
+    "_fields": {"contact": ["id", "name", "title", "company", "emails", "urls", "custom"]}
+}
