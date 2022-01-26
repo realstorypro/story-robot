@@ -6,7 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.7.2'
 
 gem 'administrate'
-gem 'airtable'
+gem 'airrecord'
 gem 'customerio'
 gem 'httparty'
 gem 'jbuilder', '~> 2.7'
@@ -30,6 +30,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'selenium-webdriver'
   gem 'webdrivers'
+  gem 'prettyprint'
 end
 
 group :development do
